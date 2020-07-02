@@ -41,7 +41,7 @@ we’ll cover the basics just to get you started:
 2.  Once installed, open Github Desktop, navigate to the menu, and
     select `File > Clone Repository...`.
 3.  In the dialog box that pops up, select the “URL” tab, and put
-    “Global-TIES-for-Children/ties.workshops” into the “Repository URL
-    or GitHub username and repository” field.
+    “Global-TIES-for-Children/workshops” into the “Repository URL or
+    GitHub username and repository” field.
 
 ![Clone repository box](man/figures/clone-repository.png)
