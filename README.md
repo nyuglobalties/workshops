@@ -42,6 +42,34 @@ we’ll cover the basics just to get you started:
     select `File > Clone Repository...`.
 3.  In the dialog box that pops up, select the “URL” tab, and put
     “Global-TIES-for-Children/workshops” into the “Repository URL or
-    GitHub username and repository” field.
+    GitHub username and repository” field. Choose whichever local path
+    that you want.
 
 ![Clone repository box](man/figures/clone-repository.png)
+
+At this point, you should have downloaded this repository. Now we need
+to set up this repository:
+
+1.  Download and install [R](https://cran.r-project.org/) *and*
+    [RStudio](https://rstudio.com/). Note: R and RStudio are *not* the
+    same thing. R is the language and execution environment, and RStudio
+    is an integrated development environment (IDE) *for* R. In other
+    words, you write code using RStudio, and then you run your code in
+    R.
+2.  Navigate to where you downloaded this repository, and open
+    `workshops.Rproj` with RStudio (double-clicking the file should do).
+3.  In the “Console” tab that should appear in the left pane, run these
+    three commands in order:
+
+<!-- end list -->
+
+``` r
+install.packages("devtools")
+devtools::install_deps(dependencies = TRUE)
+devtools::install()
+```
+
+Everything that these tutorials need should now be installed, and the
+tutorials should be available in the top-right pane under the “Tutorial”
+tab. These tutorials will be available to you in the future anytime you
+use RStudio – even if you don’t have this repository’s project open.
