@@ -1,0 +1,188 @@
+---
+title: "Session 1"
+subtitle: "Getting to Know Your Data"
+institute: "Global TIES for Children"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    nature:
+      countIncrementalSlides: false
+      highlightLines: true
+      highlightStyle: solarized-light
+---
+class: middle, center
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(xaringanthemer)
+style_mono_accent(
+  text_font_google = google_font("Montserrat", "300", "300i"),
+  code_font_google = google_font("Fira Mono")
+)
+library(magrittr)
+library(flair)
+```
+
+# Loading your data
+
+## 🗄➡ 💻
+
+---
+
+## Understanding R syntax
+
+R is built around **functions**, bits of atomic code that accept inputs and return an output.
+
+--
+
+A function looks like this:
+
+```{r, eval=FALSE}
+function_name(argument_1, argument_2, parameter = TRUE)
+```
+
+--
+
+Functions can be bundled together and shared using **packages**. To access a function from a specific package, we use the `::` operator.
+
+```{r, eval=FALSE}
+package.name::function_name(argument_1, argument_2, parameter = TRUE)
+```
+
+---
+
+## Understanding R syntax
+
+Often you frequently reuse functions from a particular package, and using `::` can get tedious and ugly to read. R allows you to **attach** those packages using the `library()` function so you can just refer to the function name.
+
+```{r, eval=FALSE}
+library(package.name)
+
+# Refers to `function_name` in `package.name`
+function_name(argument_1, argument_2, parameter = TRUE)
+```
+
+---
+
+# Tools for loading data
+
+There are many file formats out there, but these are tools we recommend for file types that we commonly work with:
+
+```{r, eval=FALSE}
+readr::read_csv()
+haven::read_dta()
+openxlsx::read.xlsx()
+```
+
+**readr** and **haven** are both part of the "_tidyverse_", a suite of packages that have a consistent, easy-to-use, and easy-to-understand design.
+
+**openxlsx** is a standalone package that is a successor to the **xlsx** package, an older utility that has a dreaded _Java dependency_. Use xlsx at your own peril!
+
+---
+
+# Let's load our data!
+
+Michael has graciously provided an anonymized example intervention dataset for us to use.
+
+It is located in the `data` directory (folder) at the root of this project. I'll use the **here** package to create paths that are _relative to the project root_.
+
+--
+
+I'll attach the packages we need for now:
+
+```{r}
+library(readr)
+library(here)
+```
+
+Note how **here** tells us where it thinks the project root is! It recursively searches upward for a directory with a `DESCRIPTION` or `.Rproj` file. 
+
+**here** is very handy utility for reproducibility since it _localizes_ paths to the project -- and not expanding to the full path on _your_ computer.
+
+---
+
+# Let's load our data!
+
+Time to load the data:
+
+```{r}
+dat <- read_csv(here("data/sample_intervention_dataset.csv"))
+```
+
+---
+
+## Two things to note
+
+.pull-left[
+
+R uses the `<-` operator to _assign_ computed values to symbols (variables) to be used later on. 
+
+```{r, eval=FALSE}
+x <- exp(-(y - mu)^2)
+```
+
+In our data's case, the results of reading the CSV file are assigned to the `dat` symbol.
+
+]
+
+.pull-right[
+
+`readr::read_csv` prints out a _column specification_ so you can understand how it interpreted the data. This is handy to diagnose some import problems (usually related to dates).
+
+```{r, echo=FALSE}
+dat <- read_csv(here("data/sample_intervention_dataset.csv"))
+```
+
+]
+
+---
+
+# Looking at our data
+
+After loading our data, it's useful to high-level view of its content to make sure that it loaded correctly.
+
+We'll use the `str()` and `print()` functions here, both part of base R.
+
+---
+
+# Looking at our data
+
+```{r}
+str(dat)
+```
+
+---
+
+# Looking at our data
+
+The _class_ of this `dat` object is a `data.frame`. `data.frame`s are R's representation of tabular data. `dat` is also a `tbl_df` ("tibble"), which is the tidyverse's version of a `data.frame` that is a little bit more stringent (i.e. safe) than base R's version, and it has a prettier `print()` method:
+
+```{r}
+print(dat)
+```
+
+---
+
+# Data types in R
+
+You may have noticed a bunch of three-letter abbreviations next to the variable names in `print(dat)` and the variable content in `str(dat)`. These are the _type signatures_ for each variable:
+
+- Double (`dbl` / `num`): All real numbers, like $50$, $23.193$, or $1.24\times10^{-8}$
+- Character (`chr`): Text/strings, written with single- or double-quotes (e.g. `"a string"`)
+
+There are a couple more that you will encounter regularly:
+
+- Integer (`int`): Integers and counting numbers. No decimals and scientific notation here!
+- Logical (`lgl`): Boolean data, written as `TRUE` or `FALSE`.
+- Factor (`fct`): Factors, R's representation of categorical data. They look like character data with `print()`, but under the hood they are integers. These should only exist in cleaned, ready-for-analysis data!
+
+---
+
+# Recap
+
+---
+class: middle, center
+
+# Working with your data
+
+## 🗄🔍
