@@ -180,6 +180,49 @@ There are a couple more that you will encounter regularly:
 
 # Recap
 
+.pull-left[
+
+How do I create a variable `x` that refers to the sentence "Hello, world!" ?
+
+]
+
+.pull-right[
+
+Use 1, 2, 3, or 4 to refer to the code line number.
+
+```{r, eval=FALSE}
+x "Hello, world!"
+"x" <- Hello, world!
+x <- "Hello, world!"
+x <- Hello, world!
+```
+
+]
+
+---
+
+# Recap
+
+.pull-left[
+
+How do I create a variable `x` that refers to the sentence "Hello, world!" ?
+
+]
+
+.pull-right[
+
+Use 1, 2, 3, or 4 to refer to the code line number.
+
+```{r, eval=FALSE}
+x "Hello, world!"
+"x" <- Hello, world!
+*x <- "Hello, world!"
+x <- Hello, world!
+```
+
+]
+
+
 ---
 class: middle, center
 
