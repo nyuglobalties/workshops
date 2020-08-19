@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Session 1</title>
+    <meta charset="utf-8" />
+    <script src="01-import-wrangle_files/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Session 1
+## Getting to Know Your Data
+### Global TIES for Children
+
+---
+
+class: middle, center
+
+
+
+# Loading your data
+
+## 🗄➡ 💻
+
+---
+
+## Understanding R syntax
+
+R is built around **functions**, bits of atomic code that accept inputs and return an output.
+
+--
+
+A function looks like this:
+
+
+```r
+function_name(argument_1, argument_2, parameter = TRUE)
+```
+
+--
+
+Functions can be bundled together and shared using **packages**. To access a function from a specific package, we use the `::` operator.
+
+
+```r
+package.name::function_name(argument_1, argument_2, parameter = TRUE)
+```
+
+---
+
+## Understanding R syntax
+
+Often you frequently reuse functions from a particular package, and using `::` can get tedious and ugly to read. R allows you to **attach** those packages using the `library()` function so you can just refer to the function name.
+
+
+```r
+library(package.name)
+
+# Refers to `function_name` in `package.name`
+function_name(argument_1, argument_2, parameter = TRUE)
+```
+
+---
+
+# Tools for loading data
+
+There are many file formats out there, but these are tools we recommend for file types that we commonly work with:
+
+
+```r
+readr::read_csv()
+haven::read_dta()
+openxlsx::read.xlsx()
+```
+
+**readr** and **haven** are both part of the "_tidyverse_", a suite of packages that have a consistent, easy-to-use, and easy-to-understand design.
+
+**openxlsx** is a standalone package that is a successor to the **xlsx** package, an older utility that has a dreaded _Java dependency_. Use xlsx at your own peril!
+
+---
+
+# Let's load our data!
+
+Michael has graciously provided an anonymized example intervention dataset for us to use.
+
+It is located in the `data` directory (folder) at the root of this project. I'll use the **here** package to create paths that are _relative to the project root_.
+
+--
+
+I'll attach the packages we need for now:
+
+
+```r
+library(readr)
+library(here)
+```
+
+```
+## here() starts at /Users/patrickanker/dev/workshops
+```
+
+Note how **here** tells us where it thinks the project root is! It recursively searches upward for a directory with a `DESCRIPTION` or `.Rproj` file. 
+
+**here** is very handy utility for reproducibility since it _localizes_ paths to the project -- and not expanding to the full path on _your_ computer.
+
+---
+
+# Let's load our data!
+
+Time to load the data:
+
+
+```r
+dat &lt;- read_csv(here("data/sample_intervention_dataset.csv"))
+```
+
+```
+## Warning: Missing column names filled in: 'X1' [1]
+```
+
+```
+## Parsed with column specification:
+## cols(
+##   X1 = col_double(),
+##   Coded_ID = col_double(),
+##   Cohort = col_character(),
+##   Intervention = col_double(),
+##   Female = col_double(),
+##   Final_grade = col_double(),
+##   Final_score = col_double(),
+##   Baseline_math_score = col_double(),
+##   Baseline_stereotype_endorsement = col_double()
+## )
+```
+
+---
+
+## Two things to note
+
+.pull-left[
+
+R uses the `&lt;-` operator to _assign_ computed values to symbols (variables) to be used later on. 
+
+
+```r
+x &lt;- exp(-(y - mu)^2)
+```
+
+In our data's case, the results of reading the CSV file are assigned to the `dat` symbol.
+
+]
+
+.pull-right[
+
+`readr::read_csv` prints out a _column specification_ so you can understand how it interpreted the data. This is handy to diagnose some import problems (usually related to dates).
+
+
+```
+## Warning: Missing column names filled in: 'X1' [1]
+```
+
+```
+## Parsed with column specification:
+## cols(
+##   X1 = col_double(),
+##   Coded_ID = col_double(),
+##   Cohort = col_character(),
+##   Intervention = col_double(),
+##   Female = col_double(),
+##   Final_grade = col_double(),
+##   Final_score = col_double(),
+##   Baseline_math_score = col_double(),
+##   Baseline_stereotype_endorsement = col_double()
+## )
+```
+
+]
+
+---
+
+# Looking at our data
+
+After loading our data, it's useful to high-level view of its content to make sure that it loaded correctly.
+
+We'll use the `str()` and `print()` functions here, both part of base R.
+
+---
+
+# Looking at our data
+
+
+```r
+str(dat)
+```
+
+```
+## tibble [100 × 9] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+##  $ X1                             : num [1:100] 1 2 3 4 5 6 7 8 9 10 ...
+##  $ Coded_ID                       : num [1:100] 1 2 3 6 9 11 14 16 17 18 ...
+##  $ Cohort                         : chr [1:100] "A" "A" "A" "A" ...
+##  $ Intervention                   : num [1:100] -1 1 1 -1 -1 -1 -1 -1 1 1 ...
+##  $ Female                         : num [1:100] 1 0 0 0 0 0 0 1 0 0 ...
+##  $ Final_grade                    : num [1:100] 3.7 2.7 2.3 3.7 4 4 3.3 0 1.7 3.7 ...
+##  $ Final_score                    : num [1:100] 83.1 70.8 69.2 84 88.2 ...
+##  $ Baseline_math_score            : num [1:100] 0.48 1.13 -0.17 1.79 -0.04 1.79 0.87 -0.04 -1.09 1.53 ...
+##  $ Baseline_stereotype_endorsement: num [1:100] 2 2 1 1 3 3 2 4 1 1 ...
+##  - attr(*, "spec")=
+##   .. cols(
+##   ..   X1 = col_double(),
+##   ..   Coded_ID = col_double(),
+##   ..   Cohort = col_character(),
+##   ..   Intervention = col_double(),
+##   ..   Female = col_double(),
+##   ..   Final_grade = col_double(),
+##   ..   Final_score = col_double(),
+##   ..   Baseline_math_score = col_double(),
+##   ..   Baseline_stereotype_endorsement = col_double()
+##   .. )
+```
+
+---
+
+# Looking at our data
+
+The _class_ of this `dat` object is a `data.frame`. `data.frame`s are R's representation of tabular data. `dat` is also a `tbl_df` ("tibble"), which is the tidyverse's version of a `data.frame` that is a little bit more stringent (i.e. safe) than base R's version, and it has a prettier `print()` method:
+
+
+```r
+print(dat)
+```
+
+```
+## # A tibble: 100 x 9
+##       X1 Coded_ID Cohort Intervention Female Final_grade Final_score
+##    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+##  1     1        1 A                -1      1         3.7        83.1
+##  2     2        2 A                 1      0         2.7        70.8
+##  3     3        3 A                 1      0         2.3        69.2
+##  4     4        6 A                -1      0         3.7        84.0
+##  5     5        9 A                -1      0         4          88.2
+##  6     6       11 A                -1      0         4          89.7
+##  7     7       14 A                -1      0         3.3        80.2
+##  8     8       16 A                -1      1         0          50.2
+##  9     9       17 A                 1      0         1.7        53.4
+## 10    10       18 A                 1      0         3.7        82.7
+## # … with 90 more rows, and 2 more variables: Baseline_math_score &lt;dbl&gt;,
+## #   Baseline_stereotype_endorsement &lt;dbl&gt;
+```
+
+---
+
+# Data types in R
+
+You may have noticed a bunch of three-letter abbreviations next to the variable names in `print(dat)` and the variable content in `str(dat)`. These are the _type signatures_ for each variable:
+
+- Double (`dbl` / `num`): All real numbers, like `\(50\)`, `\(23.193\)`, or `\(1.24\times10^{-8}\)`
+- Character (`chr`): Text/strings, written with single- or double-quotes (e.g. `"a string"`)
+
+There are a couple more that you will encounter regularly:
+
+- Integer (`int`): Integers and counting numbers. No decimals and scientific notation here!
+- Logical (`lgl`): Boolean data, written as `TRUE` or `FALSE`.
+- Factor (`fct`): Factors, R's representation of categorical data. They look like character data with `print()`, but under the hood they are integers. These should only exist in cleaned, ready-for-analysis data!
+
+---
+
+# Recap
+
+.pull-left[
+
+How do I create a variable `x` that refers to the sentence "Hello, world!" ?
+
+]
+
+.pull-right[
+
+Use 1, 2, 3, or 4 to refer to the code line number.
+
+
+```r
+x "Hello, world!"
+"x" &lt;- Hello, world!
+x &lt;- "Hello, world!"
+x &lt;- Hello, world!
+```
+
+]
+
+---
+
+# Recap
+
+.pull-left[
+
+How do I create a variable `x` that refers to the sentence "Hello, world!" ?
+
+]
+
+.pull-right[
+
+Use 1, 2, 3, or 4 to refer to the code line number.
+
+
+```r
+x "Hello, world!"
+"x" &lt;- Hello, world!
+*x &lt;- "Hello, world!"
+x &lt;- Hello, world!
+```
+
+]
+
+
+---
+class: middle, center
+
+# Working with your data
+
+## 🗄🔍
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"highlightLines": true,
+"highlightStyle": "solarized-light"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
