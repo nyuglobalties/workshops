@@ -1,0 +1,9 @@
+﻿name,description,type,coding
+Coded_ID,De-identified student ID,interger,
+Cohort,Belongs to Cohort A or B,character,
+Intervention,Self-affirmation or control exercise,interger,"coding(code(""Treatment"", 1), code(""Contrl"", -1))"
+Female,Gender,interger,"coding(code(""Female"", 1), code(""Male"", 0))"
+Final_grade,Postintervention physics final course grade on a 4-point GPA scale,double,
+Final_score,Postintervention physics final exam score,double,
+Baseline_math_score,Preintervention SAT math score,double,
+Baseline_stereotype_endorsement,Preintervention 4-point survey score on endorsement of the stereotype that men perform better than women in physics,interger,
