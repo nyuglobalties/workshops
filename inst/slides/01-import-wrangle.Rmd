@@ -23,6 +23,37 @@ library(magrittr)
 library(flair)
 ```
 
+<style>
+:root {
+  --font12: 12pt;
+  --font10: 10pt;
+}
+
+.font12 > table {
+  font-size: var(--font12);
+}
+
+.font12 > p {
+  font-size: var(--font12);
+}
+
+.font12 > pre .remark-code-line {
+  font-size: var(--font12);
+}
+
+.font10 > table {
+  font-size: var(--font10);
+}
+
+.font10 > p {
+  font-size: var(--font10);
+}
+
+.font10 > pre .remark-code-line {
+  font-size: var(--font10);
+}
+</style>
+
 # Loading your data
 
 ## 🗄➡ 💻
@@ -178,6 +209,26 @@ There are a couple more that you will encounter regularly:
 
 ---
 
+## Quick tip
+
+Often, you don't want to see _all_ rows of a dataset. For quick checks, it's useful to look at the first or last rows. To look at the **first**, use `head()`; to look at the **last**, use `tail()`:
+
+.font12[
+
+```{r}
+# First row
+head(dat, 1)
+```
+
+```{r}
+# Last 2 rows
+tail(dat, 2)
+```
+
+]
+
+---
+
 # Recap
 
 .pull-left[
@@ -222,10 +273,456 @@ x <- Hello, world!
 
 ]
 
-
 ---
 class: middle, center
 
 # Working with your data
 
 ## 🗄🔍
+
+---
+
+# Basic Data Wrangling
+
+Most data wrangling comes down to **four** basic operations:
+
+- **Filtering**: Looking for certain rows in your dataset
+- **Arranging**: Reordering your data with respect to some variables
+- **Summarizing**: Aggregating data -- to generate statistics, for example
+- **Mutating**: Creating, editing, or deleting entire variables
+
+You can also **group** these operations by variables. For example, finding the average math score in each class would be achieved by _grouping_ by class and then _summarizing_ by taking the mean.
+
+---
+
+# Basic Data Wrangling
+
+In these workshops, **we'll continue to use the Tidyverse**, but I'd be remissed if I didn't show how you'd do these operations in base R as well:
+
+.font12[
+
+| Operation   |                                       Tidyverse |                                    Base R       |
+|:------------|------------------------------------------------:|------------------------------------------------:|
+| Filtering   | `filter(dat, Cohort == "A")`                    | `dat[dat$Cohort == "A", ]`                      |
+| Arranging   | `arrange(dat, Final_grade)`                     | `dat[order(dat$Final_grade), ]`                 |
+| Summarizing | `summarize(dat, avg_score = mean(Final_score))` | `data.frame(avg_score = mean(dat$Final_score))` |
+| Mutating    | `mutate(dat, failed = Final_score < 60)`        | `dat$failed <- dat$Final_score < 60`            |
+
+]
+
+It's already apparent that the Tidyverse has a much more consistent design than base R, but when we get to grouping, it'll become even more clear to see that base R is pretty confusing to work with for wrangling.
+
+---
+
+# Basic Data Wrangling
+
+All of these Tidyverse functions are provided by the **dplyr** package.
+
+```{r}
+library(dplyr)
+```
+
+---
+
+## Filtering
+
+Looks for rows with a provided comparison, usually with `<`, `>`, `<=`, `>=`, or `==` (note: two equals!).
+
+```{r}
+filter(dat, Cohort == "A")
+```
+
+---
+
+## Arranging
+
+Sorts a dataset by a `variable` in _ascending_ order with `arrange(dat, variable)`.
+
+```{r, eval=FALSE}
+arrange(dat, Final_score)
+```
+
+```{r, echo=FALSE}
+head(arrange(dat, Final_score), 6)
+```
+
+---
+
+## Arranging
+
+Sorts a dataset in _descending_ order with `arrange(dat, -variable)`.
+
+```{r, eval=FALSE}
+arrange(dat, -Final_score)
+```
+
+```{r, echo=FALSE}
+head(arrange(dat, -Final_score), 6)
+```
+
+---
+
+## Summarizing
+
+Calculate some summary function on variables, like `mean()`, `median()`, or `sd()`:
+
+```{r}
+summarize(
+  dat, 
+  avg_score = mean(Final_score), 
+  sd_score = sd(Final_score)
+)
+```
+
+You can generate multiple summaries with multiple `summarize()` parameters.
+
+---
+
+## Mutating
+
+Create, edit, or delete variables in a dataset.
+
+```{r, eval=FALSE}
+mutate(
+  dat,
+  # Deletes the `X1` variable. 
+  # NULL is a symbol in R that means "no value" (not "missing"!).
+  X1 = NULL,
+  # Changes Cohort to an index variable
+  Cohort = ifelse(Cohort == "A", 1, 2)
+)
+```
+
+```{r, echo=FALSE}
+head(mutate(
+  dat,
+  # Deletes the `X1` variable. 
+  # NULL is a symbol in R that means "no value" (not "missing"!).
+  X1 = NULL,
+  # Changes Cohort to an index variable
+  Cohort = ifelse(Cohort == "A", 1, 2)
+), 2)
+```
+
+Note: summarizing can have an arbitrary output variable length. Editing using mutate **must** have the _same length_ as the other columns in the dataset _or length 1_, which is a signal to **dplyr** to set all rows to have the same value).
+
+---
+
+# Combining Operations
+
+These "verbs" (as **dplyr** likes to call them) are **composable** meaning you can chain these commands together, allowing you to create complex data transformations or summaries all in one step.
+
+```{r}
+summarize(
+  filter(dat, Intervention == 1), 
+  avg_final_score = mean(Final_score)
+)
+```
+
+--
+
+This is ugly. Thankfully, there is a better way of chaining these steps together!
+
+---
+
+.center[
+
+.font12[Introducing...]
+
+]
+
+--
+
+.center[
+
+## The Pipe!
+
+# `%>%`
+
+]
+
+--
+
+The pipe `%>%` is an operator provided by **dplyr**<sup>1</sup> that makes writing nested functions _much_ easier.
+
+.footnote[
+[1]: Actually **magrittr**, but that packages has more (esoteric) pipes.
+]
+
+---
+
+## The Pipe
+
+Instead of writing
+
+```r
+h(g(f(x)))
+```
+
+you can write
+
+```r
+x %>% 
+  f() %>% 
+  g() %>% 
+  h()
+```
+
+--
+
+The pipe works by inserting the result of the left hand side into the **first argument** of the right hand side.
+
+---
+
+# Combining Operations
+
+Revisiting our first chained example,
+
+```{r, eval=FALSE}
+summarize(
+  filter(dat, Intervention == 1), 
+  avg_final_score = mean(Final_score)
+)
+```
+
+we can now use
+
+```{r}
+dat %>% 
+  filter(Intervention == 1) %>% 
+  summarize(avg_final_score = mean(Final_score))
+```
+
+---
+
+## Grouping
+
+Now let's add grouping into the mix, which you can easily do with `group_by(variable)`:
+
+```{r}
+dat %>% 
+  group_by(Intervention) %>% 
+  summarize(avg_final_score = mean(Final_score))
+```
+
+---
+
+## Grouping
+
+You can group by multiple variables as well. Just add more variables to `group_by()`:
+
+```{r, eval=FALSE}
+dat %>% 
+* group_by(Intervention, Cohort) %>% 
+  summarize(avg_final_score = mean(Final_score))
+```
+
+```{r, echo=FALSE}
+dat %>% 
+  group_by(Intervention, Cohort) %>% 
+  summarize(avg_final_score = mean(Final_score))
+```
+
+---
+
+# Recap
+
+.pull-left[
+
+.font12[
+
+How would I find the median baseline stereotype by cohort and gender? For the sake of this question, let's say that `Baseline_stereotype_endorsement` has been renamed to `stereotype`.
+
+]
+
+]
+
+.pull-right[
+
+.font10[
+
+```{r, eval=FALSE}
+# 1.
+dat %>% 
+  filter(Cohort, Female) %>% 
+  summarize(
+    med_stereotype = median(stereotype)
+  )
+
+# 2.
+dat %>%
+  summarize(
+    med_stereotype = median(stereotype)
+  ) %>% 
+  group_by(Cohort, Female) 
+
+# 3.
+dat %>%
+  group_by(Cohort, Female) %>% 
+  summarize(
+    med_stereotype = median(stereotype)
+  )
+
+# 4.
+dat %>%
+  summarize(
+    med_stereotype = median(stereotype)
+  ) %>% 
+  filter(Cohort, Female)
+```
+
+]
+
+]
+
+---
+
+# Recap
+
+.pull-left[
+
+.font12[
+
+How would I find the median baseline stereotype by cohort and gender? For the sake of this question, let's say that `Baseline_stereotype_endorsement` has been renamed to `stereotype`.
+
+]
+
+]
+
+.pull-right[
+
+.font10[
+
+```{r, eval=FALSE}
+# 1.
+dat %>% 
+  filter(Cohort, Female) %>% 
+  summarize(
+    med_stereotype = median(stereotype)
+  )
+
+# 2.
+dat %>%
+  summarize(
+    med_stereotype = median(stereotype)
+  ) %>% 
+  group_by(Cohort, Female) 
+
+# 3.
+*dat %>%
+* group_by(Cohort, Female) %>% 
+* summarize(
+*   med_stereotype = median(stereotype)
+* )
+
+# 4.
+dat %>%
+  summarize(
+    med_stereotype = median(stereotype)
+  ) %>% 
+  filter(Cohort, Female)
+```
+
+]
+
+]
+
+---
+
+# Revisiting dplyr vs. base R
+
+Just to reinforce the fact that base R does not have a consistent interface, I'd like to show y'all how to do these grouped operations.
+
+--
+
+.center[
+
+### Stand by for a lot of code that doesn't make sense! 😳
+
+]
+
+---
+
+## Filtering
+
+```{r, eval=FALSE}
+# dat %>% 
+#   group_by(Cohort) %>% 
+#   filter(Final_score > 85)
+
+partioned <- lapply(
+  unique(dat$Cohort), 
+  function(cohort) dat[dat$Cohort == cohort, ]
+)
+
+filtered <- lapply(
+  partioned, 
+  function(part) part[part$Final_score > 85, ]
+)
+
+do.call(rbind, filtered)
+```
+
+---
+
+## Mutating
+
+Grouped mutates can be useful when cleaning longitudinal data per participant, e.g. restricting age to be the baseline observation of the participant.
+
+.font12[
+
+```{r, eval=FALSE}
+# dat %>%
+#   group_by(Cohort) %>%
+#   mutate(median_stereotype = median(Baseline_stereotype_endorsement))
+
+partioned <- lapply(
+  unique(dat$Cohort), 
+  function(cohort) dat[dat$Cohort == cohort, ]
+)
+
+mutated <- lapply(
+  partioned, 
+  function(part) {
+    part$median_stereotype <- median(part$Baseline_stereotype_endorsement)
+    part
+  }
+)
+
+do.call(rbind, mutated)
+```
+
+]
+
+---
+
+## Summarizing
+
+.font12[
+
+```{r}
+# dat %>% 
+#   group_by(Intervention, Cohort) %>% 
+#   summarize(avg_final_score = mean(Final_score))
+
+agg <- aggregate(Final_score ~ Intervention + Cohort, data = dat, FUN = mean)
+names(agg) <- ifelse(names(agg) == "Final_score", "avg_final_score", names(agg))
+agg
+```
+
+]
+
+---
+
+## Long story short
+
+Base R _does_ have the capability to do all of these operations out of the box.
+
+--
+
+The problem is you have to know a **lot** of the language to do **anything useful**. This contributes to a steep and unproductive learning curve which dismays all but the most tenacious "leaRners".
+
+--
+
+### I don't want y'all to have that experience!
+
