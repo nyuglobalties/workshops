@@ -51,6 +51,10 @@ mutate(
   Cohort = ifelse(Cohort == "A", 1, 2)
 )
 
+# Tidyverse caution ----
+mean(Final_score)  # Errors!
+mean(dat$Final_score)
+
 # Combining operations ----
 summarize(
   filter(dat, Intervention == 1),

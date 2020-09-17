@@ -588,6 +588,73 @@ Note: summarizing can have an arbitrary output variable length. Editing using mu
 
 ---
 
+.center[
+# ⚠️
+## Tidyverse Caution!
+]
+
+The Tidyverse (mainly **dplyr**, but a couple other packages) refers to variables in datasets with "naked" symbols.&lt;sup&gt;1&lt;/sup&gt;
+
+
+
+
+&lt;code class ='r hljs remark-code'&gt;summarize(dat, avg_score = mean(&lt;span style="background-color:#ffff7f"&gt;Final_score&lt;/span&gt;))&lt;/code&gt;
+
+```
+
+## # A tibble: 1 x 1
+##   avg_score
+##       &lt;dbl&gt;
+## 1      72.8
+
+```
+
+.footnote[
+[1]: In computer science lingo, these are technically called _quoted symbols_, but that can be confusing.
+]
+
+---
+
+.center[
+# ⚠️
+## Tidyverse Caution!
+]
+
+But _outside_ of the Tidyverse functions, these variables **are not defined**.
+
+
+```r
+mean(Final_score)
+```
+
+```
+## Error in mean(Final_score): object 'Final_score' not found
+```
+
+---
+
+.center[
+# ⚠️
+## Tidyverse Caution!
+]
+
+To access dataset variables outside of Tidyverse functions, you must use the **`$`** ("extract") operator in conjunction with the symbol for the parent dataset.
+
+
+
+
+&lt;code class ='r hljs remark-code'&gt;mean(&lt;span style="background-color:#ffff7f"&gt;dat$&lt;/span&gt;Final_score)&lt;/code&gt;
+
+```
+
+## [1] 72.8379
+
+```
+
+Just keep this in mind!
+
+---
+
 # Combining Operations
 
 These "verbs" (as **dplyr** likes to call them) are **composable** meaning you can chain these commands together, allowing you to create complex data transformations or summaries all in one step.
@@ -960,6 +1027,19 @@ The problem is you have to know a **lot** of the language to do **anything usefu
 
 ### I don't want y'all to have that experience!
 
+---
+
+# Exercise
+
+Our dataset `dat` examines the stereotypical belief that men perform better in physics than women, and how self-affirmation exercises may affect the end-of-term physics score. `Baseline_stereotype_endorsement` is a Likert-scale (1, strongly disagree - 5, strongly agree) preintervention variable that asks if a participant believes that men perform better than women in physics. `Baseline_math_score` is the standardized math SAT score for each participant. 
+
+### On average, what do men and women who strongly disagree and strongly agree with the stereotype perform on the math SAT?
+
+.footnote[
+
+Consider using the `|` (read: **or**) operator to combine multiple filter statements into one (e.g. filtering for `this` or `that` would be `filter(dat, this | that)`).
+
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -408,6 +408,61 @@ Note: summarizing can have an arbitrary output variable length. Editing using mu
 
 ---
 
+.center[
+# ⚠️
+## Tidyverse Caution!
+]
+
+The Tidyverse (mainly **dplyr**, but a couple other packages) refers to variables in datasets with "naked" symbols.<sup>1</sup>
+
+```{r flaired_symbols, include=FALSE}
+summarize(dat, avg_score = mean(Final_score))
+```
+
+```{r, echo=FALSE}
+decorate("flaired_symbols") %>% 
+  flair("Final_score")
+```
+
+.footnote[
+[1]: In computer science lingo, these are technically called _quoted symbols_, but that can be confusing.
+]
+
+---
+
+.center[
+# ⚠️
+## Tidyverse Caution!
+]
+
+But _outside_ of the Tidyverse functions, these variables **are not defined**.
+
+```{r, error=TRUE}
+mean(Final_score)
+```
+
+---
+
+.center[
+# ⚠️
+## Tidyverse Caution!
+]
+
+To access dataset variables outside of Tidyverse functions, you must use the **`$`** ("extract") operator in conjunction with the symbol for the parent dataset.
+
+```{r extract_op, include=FALSE}
+mean(dat$Final_score)
+```
+
+```{r, echo=FALSE}
+decorate("extract_op") %>% 
+  flair_rx("\\w+\\$")
+```
+
+Just keep this in mind!
+
+---
+
 # Combining Operations
 
 These "verbs" (as **dplyr** likes to call them) are **composable** meaning you can chain these commands together, allowing you to create complex data transformations or summaries all in one step.
@@ -726,3 +781,16 @@ The problem is you have to know a **lot** of the language to do **anything usefu
 
 ### I don't want y'all to have that experience!
 
+---
+
+# Exercise
+
+Our dataset `dat` examines the stereotypical belief that men perform better in physics than women, and how self-affirmation exercises may affect the end-of-term physics score. `Baseline_stereotype_endorsement` is a Likert-scale (1, strongly disagree - 5, strongly agree) preintervention variable that asks if a participant believes that men perform better than women in physics. `Baseline_math_score` is the standardized math SAT score for each participant. 
+
+### On average, how do men and women who strongly disagree and strongly agree with the stereotype perform on the math SAT?
+
+.footnote[
+
+Consider using the `|` (read: **or**) operator to combine multiple filter statements into one (e.g. filtering for `this` or `that` would be `filter(dat, this | that)`).
+
+]
