@@ -111,6 +111,19 @@ openxlsx::read.xlsx()
 
 ---
 
+# Tools for loading data
+
+All of these packages _should_ have been installed if you followed [the setup instructions](https://github.com/nyuglobalties/workshops#get-materials), but for future reference you can install these (and any package) with `install.packages("package.name")`:
+
+```r
+install.packages("tidyverse")
+install.packages("haven")
+```
+
+**NB:** Only run these commands **once**. Once they're installed, you don't need to run that command again since the package will be on your computer.
+
+---
+
 # Let's load our data!
 
 Michael has graciously provided an anonymized example intervention dataset for us to use.
@@ -177,6 +190,10 @@ We'll use the `str()` and `print()` functions here, both part of base R.
 ---
 
 # Looking at our data
+
+```{r, include=FALSE}
+attr(dat, "spec") <- NULL
+```
 
 ```{r}
 str(dat)

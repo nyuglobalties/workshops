@@ -112,6 +112,19 @@ openxlsx::read.xlsx()
 
 ---
 
+# Tools for loading data
+
+All of these packages _should_ have been installed if you followed [the setup instructions](https://github.com/nyuglobalties/workshops#get-materials), but for future reference you can install these (and any package) with `install.packages("package.name")`:
+
+```r
+install.packages("tidyverse")
+install.packages("haven")
+```
+
+**NB:** Only run these commands **once**. Once they're installed, you don't need to run that command again since the package will be on your computer.
+
+---
+
 # Let's load our data!
 
 Michael has graciously provided an anonymized example intervention dataset for us to use.
@@ -222,6 +235,8 @@ We'll use the `str()` and `print()` functions here, both part of base R.
 # Looking at our data
 
 
+
+
 ```r
 str(dat)
 ```
@@ -237,18 +252,6 @@ str(dat)
 ##  $ Final_score                    : num [1:100] 83.1 70.8 69.2 84 88.2 ...
 ##  $ Baseline_math_score            : num [1:100] 0.48 1.13 -0.17 1.79 -0.04 1.79 0.87 -0.04 -1.09 1.53 ...
 ##  $ Baseline_stereotype_endorsement: num [1:100] 2 2 1 1 3 3 2 4 1 1 ...
-##  - attr(*, "spec")=
-##   .. cols(
-##   ..   X1 = col_double(),
-##   ..   Coded_ID = col_double(),
-##   ..   Cohort = col_character(),
-##   ..   Intervention = col_double(),
-##   ..   Female = col_double(),
-##   ..   Final_grade = col_double(),
-##   ..   Final_score = col_double(),
-##   ..   Baseline_math_score = col_double(),
-##   ..   Baseline_stereotype_endorsement = col_double()
-##   .. )
 ```
 
 ---
