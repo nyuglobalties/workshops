@@ -1,19 +1,20 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Data Team Workshops
+Data Team Workshops
+===================
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
-Welcome to the Data Team workshops page\! If you want to learn R or use
+Welcome to the Data Team workshops page! If you want to learn R or use
 the tools in our data pipeline, you’ve come to the right place. Over
 time we’ll add more and more tutorials to cover a breadth of topics so
 that you can explore the R ecosystem and see how it could benefit your
 workflow.
 
-## Tutorial References
+Tutorial References
+-------------------
 
 Much of our R tutorials are based on the exceptionally handy [*R for
 Data Science*](https://r4ds.had.co.nz/) by Grolemund and Wickham. Rather
@@ -30,11 +31,27 @@ sheets are designed so that you can *visually* understand what the
 functions are doing, which builds a stronger intuition than just reading
 the function documentation.
 
-## Setup
+Get Materials
+-------------
 
-All tutorials are located in this package, so you will need to download
-this repository. We’ll have a git & Github tutorial soon, but for now
-we’ll cover the basics just to get you started:
+All materials for the workshops are contained in this repository. You’ll
+need to download this repo to get started. There are a couple methods
+you can use.
+
+### ZIP Download
+
+Github provides downloadable ZIP archives of entire repositories for
+ease of use. Use the “Download ZIP” menu item via the “Code” button
+shown below:
+
+![](man/figures/github-download-zip.png)
+
+Extract the ZIP in a folder you remember, and you’ll be all set.
+
+### Git-based
+
+We’ll have a git & Github tutorial soon, but for now we’ll cover the
+basics just to get you started:
 
 1.  Install [Github Desktop](https://desktop.github.com/). This
     application takes care of most git workflow tasks.
@@ -47,6 +64,9 @@ we’ll cover the basics just to get you started:
 
 ![Clone repository box](man/figures/clone-repository.png)
 
+Get Set Up
+----------
+
 At this point, you should have downloaded this repository. Now we need
 to set up this repository:
 
@@ -54,22 +74,17 @@ to set up this repository:
     [RStudio](https://rstudio.com/). Note: R and RStudio are *not* the
     same thing. R is the language and execution environment, and RStudio
     is an integrated development environment (IDE) *for* R. In other
-    words, you write code using RStudio, and then you run your code in
-    R.
+    words, you write code using RStudio, and then you run your code
+    in R.
 2.  Navigate to where you downloaded this repository, and open
     `workshops.Rproj` with RStudio (double-clicking the file should do).
 3.  In the “Console” tab that should appear in the left pane, run these
     three commands in order:
 
-<!-- end list -->
+<!-- -->
 
-``` r
-install.packages("devtools")
-devtools::install_deps(dependencies = TRUE)
-devtools::install()
-```
+    install.packages("devtools")
+    devtools::install_deps(dependencies = TRUE)
 
-Everything that these tutorials need should now be installed, and the
-tutorials should be available in the top-right pane under the “Tutorial”
-tab. These tutorials will be available to you in the future anytime you
-use RStudio – even if you don’t have this repository’s project open.
+All of the packages that all materials depend upon should now be
+installed.
