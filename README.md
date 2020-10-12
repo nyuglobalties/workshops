@@ -31,8 +31,13 @@ sheets are designed so that you can *visually* understand what the
 functions are doing, which builds a stronger intuition than just reading
 the function documentation.
 
-Get Materials
--------------
+Setup
+=====
+
+There are a couple steps to take to get ready:
+
+1 - Get Materials
+-----------------
 
 All materials for the workshops are contained in this repository. You’ll
 need to download this repo to get started. There are a couple methods
@@ -64,8 +69,8 @@ basics just to get you started:
 
 ![Clone repository box](man/figures/clone-repository.png)
 
-Get Set Up
-----------
+2 - Get Set Up
+--------------
 
 At this point, you should have downloaded this repository. Now we need
 to set up this repository:

@@ -27,7 +27,11 @@ Much of our R tutorials are based on the exceptionally handy [*R for Data Scienc
 
 Once you feel comfortable working with R, the [RStudio cheatsheets](https://rstudio.com/resources/cheatsheets/) are an invaluable resource when you need some form of quick reference. The sheets are designed so that you can *visually* understand what the functions are doing, which builds a stronger intuition than just reading the function documentation.
 
-## Get Materials
+# Setup
+
+There are a couple steps to take to get ready:
+
+## 1 - Get Materials
 
 All materials for the workshops are contained in this repository. You'll need to download this repo to get started. There are a couple methods you can use.
 
@@ -49,7 +53,7 @@ We'll have a git & Github tutorial soon, but for now we'll cover the basics just
 
 ![Clone repository box](man/figures/clone-repository.png)
 
-## Get Set Up
+## 2 - Get Set Up
 
 At this point, you should have downloaded this repository. Now we need to set up this repository:
 
