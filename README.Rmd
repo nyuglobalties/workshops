@@ -55,7 +55,7 @@ At this point, you should have downloaded this repository. Now we need to set up
 
 1.  Download and install [R](https://cran.r-project.org/) *and* [RStudio](https://rstudio.com/). Note: R and RStudio are *not* the same thing. R is the language and execution environment, and RStudio is an integrated development environment (IDE) *for* R. In other words, you write code using RStudio, and then you run your code in R.
 2.  Navigate to where you downloaded this repository, and open `workshops.Rproj` with RStudio (double-clicking the file should do).
-3.  In the "Console" tab that should appear in the left pane, run these three commands in order:
+3.  In the "Console" tab that should appear in the left pane, run these two commands in order:
 
 ```{r, eval=FALSE}
 install.packages("devtools")

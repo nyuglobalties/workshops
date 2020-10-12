@@ -79,7 +79,7 @@ to set up this repository:
 2.  Navigate to where you downloaded this repository, and open
     `workshops.Rproj` with RStudio (double-clicking the file should do).
 3.  In the “Console” tab that should appear in the left pane, run these
-    three commands in order:
+    two commands in order:
 
 <!-- -->
 
