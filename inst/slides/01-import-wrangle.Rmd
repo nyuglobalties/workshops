@@ -10,7 +10,6 @@ output:
       highlightLines: true
       highlightStyle: solarized-light
 ---
-class: middle, center
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
@@ -54,6 +53,28 @@ library(flair)
 }
 </style>
 
+# Agenda
+
+By the end of this workshop, you should be able to understand this block of code:
+
+```{r, eval = FALSE}
+dat <- read_csv(here("data/dataset.csv"))
+
+dat %>% 
+  group_by(grade) %>% 
+  summarize(avg_age = mean(age))
+```
+
+We'll be covering
+
+- Basic R syntax
+- Data loading
+- Data inspection
+- Basic data transformation
+
+---
+class: middle, center
+
 # Loading your data
 
 ## 🗄➡ 💻
@@ -91,6 +112,13 @@ library(package.name)
 
 # Refers to `function_name` in `package.name`
 function_name(argument_1, argument_2, parameter = TRUE)
+```
+
+If you're familiar with STATA, this would be _roughly_ translated to
+
+```
+// Using 1 as `TRUE`
+function_name argument_1 argument_2, parameter 1
 ```
 
 ---
@@ -203,11 +231,23 @@ str(dat)
 
 # Looking at our data
 
-The _class_ of this `dat` object is a `data.frame`. `data.frame`s are R's representation of tabular data. `dat` is also a `tbl_df` ("tibble"), which is the tidyverse's version of a `data.frame` that is a little bit more stringent (i.e. safe) than base R's version, and it has a prettier `print()` method:
+The _class_ of this `dat` object is a `data.frame`. `data.frame`s are R's representation of tabular data. `dat` is also a `tbl_df` ("tibble"), which is the Tidyverse's version of a `data.frame` that is a little bit more stringent (i.e. safe) than base R's version, and it has a prettier `print()` method:
 
 ```{r}
 print(dat)
 ```
+
+---
+
+# Looking at our data
+
+If you'd like to see _all_ of your data in a pretty Excel-like spreadsheet, use the `View()` function which has a great display in RStudio.
+
+```{r, eval=FALSE}
+View(dat)
+```
+
+Note: if you _don't_ use RStudio, `View()` defaults to a fairly ugly display using X11. If you want to use this feature, use it with RStudio!
 
 ---
 
@@ -243,6 +283,24 @@ tail(dat, 2)
 ```
 
 ]
+
+---
+
+## Quick tip
+
+When you encounter a function that you don't know or understand for some reason, **consult the R help system**!
+
+Type a `?` followed by the function name into the R console, and the help page with appear in the "Help" pane (or in the Console if you're in a terminal-only environment).
+
+```{r}
+?head
+```
+
+If you're not certain what a function name is or you're looking for a certain topic, use `??` (think: "wildcard search") followed by the topic name.
+
+```{r}
+??head
+```
 
 ---
 
@@ -296,6 +354,16 @@ class: middle, center
 # Working with your data
 
 ## 🗄🔍
+
+---
+
+# Working with your data
+
+What we'll be discussing today is basic *data wrangling*.
+
+> Data wrangling (n.): The process of transforming data from one raw form into another format with the intent of making it more appropriate and valuable for a variety of downstream purposes such as analytics.
+> 
+> <em>&mdash;Wikipedia</em>
 
 ---
 

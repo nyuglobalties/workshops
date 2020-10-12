@@ -8,9 +8,14 @@ dat <- read_csv(here("data/sample_intervention_dataset.csv"))
 # Looking at the data ----
 str(dat)
 print(dat)
+View(dat)
 
 head(dat, 1)
 tail(dat, 2)
+
+# Getting help ----
+?head
+??head
 
 # Tidyverse/base R comparison ----
 library(dplyr)
