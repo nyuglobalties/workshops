@@ -31,6 +31,15 @@ sheets are designed so that you can *visually* understand what the
 functions are doing, which builds a stronger intuition than just reading
 the function documentation.
 
+Workshop Recordings
+===================
+
+Access to all recordings requires an NYU login (choose the “Sign in with
+SSO” button)
+
+1.  [Session 1: Getting to Know Your
+    Data](https://nyu.zoom.us/rec/share/VLku7fo5upo3bVs8xdS8K92Q2UPwzrfzCHUxVGPCJh6XZtQqLGlElp2H4aUvEQr3.NghErP0lw2NxupVV)
+
 Setup
 =====
 
