@@ -55,6 +55,14 @@ library(flair)
   font-size: var(--font10);
 }
 
+.font10.rendered > pre {
+  font-size: var(--font10);
+  font-family: var(--code-font-family);
+  background-color: #fdf6e3;
+  color: #657b83;
+  padding: 5px;
+}
+
 .yellow {
   color: var(--nyu-yellow);
 }
@@ -104,9 +112,9 @@ dat %>%
 
 We'll be covering
 
+- R Markdown
 - Combining datasets (joins and binding)
 - The wonderful plotting library **ggplot2**
-- R Markdown
 
 For all of this presentation, I will have the Tidyverse attached and our intervention dataset loaded:
 
@@ -120,6 +128,88 @@ intervention <- read_csv(
 ```
 
 The `col_types = cols()` parameter suppresses the **readr** column specification.
+
+---
+
+# R Markdown
+
+For the rest of these workshops, I'll include a `_notes.Rmd` document in the `inst/slides` folder to supplement the slides. This is an example of an **R Markdown** document, an implementation of **literate programming** (adding plain text alongside code to explain what's going on).
+
+An R Markdown document is a Markdown document (basically plain text with some formatting syntax) with "R chunks", blocks of R code that run to produce any kind of output. Example:
+
+.font10.rendered[
+
+```{r, echo=FALSE, results='asis'}
+cat_line <- function(...) cat(..., "\n", sep = "")
+paragraph <- function(...) {
+  cat_line(...)
+  cat_line()
+}
+
+with_pre <- function(code) {
+  cat_line("<pre>")
+  code
+  cat_line("</pre>")
+}
+
+with_r_chunk <- function(code) {
+  cat_line("```{r}")
+  code
+  cat_line("```")
+}
+
+h_tag <- function(x, n) {
+  hashes <- paste0(rep("#", n), collapse = "")
+  
+  paragraph(hashes, " ", x)
+}
+
+h1 <- function(x) h_tag(x, 1)
+
+with_pre({
+  h1("Some header")
+  paragraph("This is some text")
+  
+  with_r_chunk({
+    cat_line("some %>%")
+    cat_line("  code() %>% ")
+    cat_line("  that() %>% ")
+    cat_line("  runs()")
+  })
+})
+```
+
+]
+
+This is a powerful way to generate **dynamic** documents (including this slideshow!) from a single, computable source of information. Let's take a look at the `notes` file!
+
+---
+
+# R Markdown Output Types
+
+R Markdown can generate all sorts of output:
+
+.pull-left[
+
+- Web / HTML documents
+- Word documents
+- PDF / LaTeX documents
+- Journal-ready articles via the **rticles** package
+
+]
+
+.pull-right[
+
+- Books
+- Slideshows
+- Dynamic web dashboards via **Shiny**
+- Interactive educational applets via the **learnr** package
+
+]
+
+... and much more!
+
+Check out [RStudio's intro guide to Rmd](https://rmarkdown.rstudio.com/) and [Yihui Xie (the creator)'s book](https://bookdown.org/yihui/rmarkdown/) on R Markdown for more references.
 
 ---
 class: inverse, middle, center

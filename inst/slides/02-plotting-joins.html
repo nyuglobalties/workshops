@@ -52,6 +52,14 @@ class: center, middle, inverse, title-slide
   font-size: var(--font10);
 }
 
+.font10.rendered &gt; pre {
+  font-size: var(--font10);
+  font-family: var(--code-font-family);
+  background-color: #fdf6e3;
+  color: #657b83;
+  padding: 5px;
+}
+
 .yellow {
   color: var(--nyu-yellow);
 }
@@ -102,9 +110,9 @@ dat %&gt;%
 
 We'll be covering
 
+- R Markdown
 - Combining datasets (joins and binding)
 - The wonderful plotting library **ggplot2**
-- R Markdown
 
 For all of this presentation, I will have the Tidyverse attached and our intervention dataset loaded:
 
@@ -123,6 +131,61 @@ intervention &lt;- read_csv(
 ```
 
 The `col_types = cols()` parameter suppresses the **readr** column specification.
+
+---
+
+# R Markdown
+
+For the rest of these workshops, I'll include a `_notes.Rmd` document in the `inst/slides` folder to supplement the slides. This is an example of an **R Markdown** document, an implementation of **literate programming** (adding plain text alongside code to explain what's going on).
+
+An R Markdown document is a Markdown document (basically plain text with some formatting syntax) with "R chunks", blocks of R code that run to produce any kind of output. Example:
+
+.font10.rendered[
+
+&lt;pre&gt;
+# Some header
+
+This is some text
+
+```{r}
+some %&gt;%
+  code() %&gt;% 
+  that() %&gt;% 
+  runs()
+```
+&lt;/pre&gt;
+
+]
+
+This is a powerful way to generate **dynamic** documents (including this slideshow!) from a single, computable source of information. Let's take a look at the `notes` file!
+
+---
+
+# R Markdown Output Types
+
+R Markdown can generate all sorts of output:
+
+.pull-left[
+
+- Web / HTML documents
+- Word documents
+- PDF / LaTeX documents
+- Journal-ready articles via the **rticles** package
+
+]
+
+.pull-right[
+
+- Books
+- Slideshows
+- Dynamic web dashboards via **Shiny**
+- Interactive educational applets via the **learnr** package
+
+]
+
+... and much more!
+
+Check out [RStudio's intro guide to Rmd](https://rmarkdown.rstudio.com/) and [Yihui Xie (the creator)'s book](https://bookdown.org/yihui/rmarkdown/) on R Markdown for more references.
 
 ---
 class: inverse, middle, center
@@ -551,7 +614,7 @@ jfk_weather %&gt;%
 
 .pull-right[
 
-&lt;img src="02-plotting-joins_files/figure-html/unnamed-chunk-18-1.png" width="300" height="300" /&gt;
+&lt;img src="02-plotting-joins_files/figure-html/unnamed-chunk-19-1.png" width="300" height="300" /&gt;
 
 
 An empty plot! Let's add a histogram...
@@ -572,7 +635,7 @@ Histograms (and kinds of plots in general) are a type of **geometry**. We can ac
 &lt;code class ='r hljs remark-code'&gt;jfk_weather %&gt;% &lt;br&gt;&amp;nbsp;&amp;nbsp;ggplot(aes(x = precip)) &lt;span style="color:#c50f3c;text-weight:bold"&gt;+&lt;/span&gt; # Note the plus!! In ggplot, you "add" layers like a stack.&lt;br&gt;&amp;nbsp;&amp;nbsp;geom_histogram()&lt;/code&gt;
 
 
-&lt;img src="02-plotting-joins_files/figure-html/unnamed-chunk-36-1.png" height="325" /&gt;
+&lt;img src="02-plotting-joins_files/figure-html/unnamed-chunk-37-1.png" height="325" /&gt;
 
 ]
 
@@ -643,7 +706,7 @@ jfk_flights_weather %&gt;%
   geom_point()
 ```
 
-&lt;img src="02-plotting-joins_files/figure-html/unnamed-chunk-22-1.png" height="325" /&gt;
+&lt;img src="02-plotting-joins_files/figure-html/unnamed-chunk-23-1.png" height="325" /&gt;
 
 ]
 
@@ -677,7 +740,7 @@ jfk_flights_weather %&gt;%
 
 .pull-right[
 
-![](02-plotting-joins_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+![](02-plotting-joins_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -703,7 +766,7 @@ We can also use a jitter plot to reduce the regularity in the dots and imply tha
 
 .pull-right[
 
-![](02-plotting-joins_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+![](02-plotting-joins_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -741,7 +804,7 @@ The `mutate()` statement which converts `carrier` to a factor is necessary since
 
 .pull-right[
 
-![](02-plotting-joins_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
+![](02-plotting-joins_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -780,7 +843,7 @@ To make this publication-ready, we need a few things: a title and good axis labe
 
 .pull-right[
 
-![](02-plotting-joins_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
+![](02-plotting-joins_files/figure-html/unnamed-chunk-31-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -813,7 +876,7 @@ For me, there are too many airlines on this plot -- it looks like spaghetti. Ins
 
 .pull-right[
 
-![](02-plotting-joins_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+![](02-plotting-joins_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
 
 ]
 
@@ -854,7 +917,7 @@ jfk_flights_weather %&gt;%
 
 .pull-right[
 
-![](02-plotting-joins_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+![](02-plotting-joins_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
 
 ]
 

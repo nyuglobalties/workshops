@@ -93,9 +93,9 @@ dat %>%
 
 We'll be covering
 
+-   R Markdown
 -   Combining datasets (joins and binding)
 -   The wonderful plotting library **ggplot2**
--   R Markdown
 
 For all of this presentation, I will have the Tidyverse attached and our intervention dataset loaded:
 
