@@ -1,0 +1,587 @@
+---
+title: "Session 2"
+subtitle: "Finding Relationships in Your Data"
+institute: "Global TIES for Children"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+library(magrittr)
+library(flair)
+```
+
+```{=html}
+<style>
+:root {
+  --font12: 12pt;
+  --font10: 10pt;
+  --nyu-yellow: #ecaa00;
+  --nyu-red: #c50f3c;
+  --nyu-violet: #57068c;
+}
+
+.font12 > table {
+  font-size: var(--font12);
+}
+
+.font12 > p {
+  font-size: var(--font12);
+}
+
+.font12 > pre .remark-code-line {
+  font-size: var(--font12);
+}
+
+.font10 > table {
+  font-size: var(--font10);
+}
+
+.font10 > p {
+  font-size: var(--font10);
+}
+
+.font10 > pre .remark-code-line {
+  font-size: var(--font10);
+}
+
+.yellow {
+  color: var(--nyu-yellow);
+}
+
+.red {
+  color: var(--nyu-red);
+}
+
+.violet {
+  color: var(--nyu-violet);
+}
+</style>
+```
+# Last Time
+
+We talked about:
+
+-   An introduction to R syntax
+-   Loading and viewing your data
+-   R's data types
+-   Basic data wrangling
+
+------------------------------------------------------------------------
+
+# Agenda
+
+By the end of this workshop, you should be able to understand this block of code:
+
+```{r, eval = FALSE}
+dat <- read_csv(here("data/dataset.csv"))
+admin_dat <- read_csv("data/admin.csv")
+
+dat %>% 
+  left_join(
+    admin_dat %>% 
+      select(student_id, registration_date),
+    by = "student_id"
+  ) %>% 
+  ggplot(aes(registration_date)) +
+  geom_histogram() +
+  facet_wrap(~ grade)
+```
+
+------------------------------------------------------------------------
+
+We'll be covering
+
+-   Combining datasets (joins and binding)
+-   The wonderful plotting library **ggplot2**
+-   R Markdown
+
+For all of this presentation, I will have the Tidyverse attached and our intervention dataset loaded:
+
+```{r}
+suppressPackageStartupMessages(library(tidyverse))
+
+intervention <- read_csv(
+  here::here("data/sample_intervention_dataset.csv"), 
+  col_types = cols()
+)
+```
+
+The `col_types = cols()` parameter suppresses the **readr** column specification.
+
+------------------------------------------------------------------------
+
+# Combining Data to Make New Data
+
+There are two main kinds of combining datasets together:
+
+1.  **Binding** datasets, either binding rows or columns together
+2.  **Joining** (or **merging**) datasets based on shared information
+
+**Binding** is useful for combining *similarly structured* data.
+
+**Joining** is the more general case where the datasets need not have similar structure but *must* have a common variable (or set of variables).
+
+------------------------------------------------------------------------
+
+# Binding
+
+The two primary commands relate to the two *dimensions* of how you can bind data: `bind_rows()` and `bind_cols()` (both from **dplyr**).
+
+I'll only be discussing `bind_rows()` since `bind_cols()` is *very rarely* the right way to add variables from other datasets into a working dataset, *and* it can be a [brittle and potentially dangerous]{.red} operation.
+
+To motivate the use of `bind_rows()`, I will split the intervention dataset into two datasets, each with its own cohort:
+
+```{r}
+cohort_a <- intervention %>% filter(Cohort == "A")
+cohort_b <- intervention %>% filter(Cohort == "B")
+```
+
+Row binding is useful when you have *multiple versions* of the same (or similar) datasets and you'd like to combine them into one.
+
+------------------------------------------------------------------------
+
+To verify we have different datasets, let's take a peek at them...
+
+```{r}
+head(cohort_a, 2)
+```
+
+```{r}
+head(cohort_b, 2)
+```
+
+------------------------------------------------------------------------
+
+... and now bound together:
+
+```{r}
+set.seed(1283) # Always set an RNG seed to get reproducible results!
+
+bind_rows(cohort_a, cohort_b) %>% 
+  slice_sample(n = 5)
+```
+
+`slice_sample()` is a function from **dplyr** that picks rows at random, a derivative of `slice()` which filters the dataset to a specific row number range.
+
+------------------------------------------------------------------------
+
+By default, the row binding operation matches columns based on column order (i.e. match column 1 in `cohort_a` to column 1 in `cohort_b`, 2 to 2, and so on).
+
+If the two datasets have **slightly different** columns (like, reordered columns or some missing columns), `bind_rows()` takes care of this situation by **matching by column *name***.
+
+------------------------------------------------------------------------
+
+To show this, I'll create a different `cohort_b` with some dropped and reordered columns from `cohort_b`.
+
+```{r}
+different_cohort_b <-
+  cohort_b %>% 
+  select(Coded_ID, Intervention:Final_score)
+```
+
+```{r, include=FALSE}
+pretty_col_names <- function(dat) {
+  col_names <- paste0("\u0060", names(dat), "\u0060")
+  
+  if (length(col_names) > 1) {
+    col_names[length(col_names)] <- paste0("and ", col_names[length(col_names)])
+  }
+  
+  if (length(col_names) > 2) {
+    collapse_delim <- ", "
+  } else {
+    collapse_delim <- " "
+  }
+  
+  paste0(col_names, collapse = collapse_delim)
+}
+```
+
+The columns of `cohort_b` are `r pretty_col_names(cohort_b)`...
+
+...whereas the columns of `different_cohort_b` are `r pretty_col_names(different_cohort_b)`.
+
+------------------------------------------------------------------------
+
+Row binding them together:
+
+```{r}
+cohort_b %>% 
+  head(n = 3) %>% 
+  bind_rows(head(different_cohort_b, 3))
+```
+
+Note how `X1` and `Cohort` are filled in with **missingness** (shown as `r NA`) since they don't exist in `different_cohort_b`.
+
+------------------------------------------------------------------------
+
+# Joining & Relational Data
+
+Unlike stacking similar data into a single dataset with row binding, **joining** or **merging** is **the** way to the bring variables from other datasets together<sup>1</sup> based on some shared information called **keys**.
+
+There are two major kinds of keys and one minor but important one to remember:
+
+1.  **Primary keys**: Columns that uniquely identify each observed entity in your current dataset (major)
+2.  **Foreign keys**: Columns that uniquely identify entities in *different* datasets, e.g. a school ID in a child-level dataset (major)
+3.  **Surrogate keys**: Columns that uniquely identify *each row* (no duplicates!), e.g. a random serial number for each survey submission (minor but important)
+
+Datasets that have these keys that form relations among each other are called **relational data**.
+
+(1): *Column* binding assumes that the row order *and* meaning is same among column-bound datasets which is *very* rarely the case. This is why it's better to use joins.
+
+------------------------------------------------------------------------
+
+To demonstrate joins, I'll be using the `nycflights13` dataset like *R for Data Science*.
+
+```{r}
+library(nycflights13)
+```
+
+It has 5 datasets:
+
+-   `flights`: A log of all flights *from* the New York area (JFK, LGA, and EWR) in 2013
+-   `airlines`: Information on each airline (primary key is `carrier`)
+-   `airports`: Information on each airport in the flight log (primary key is `faa`)
+-   `planes`: Information on each plane itself (primary key is `tailnum`)
+-   `weather`: Hourly readings of the weather at each NY area airport
+
+------------------------------------------------------------------------
+
+```{r, echo=FALSE, out.width=400}
+knitr::include_graphics("../images/relational-nycflights.png")
+```
+
+Source: [Grolemund & Wickham](https://r4ds.had.co.nz/relational-data.html#nycflights13-relational)
+
+This image, a *relational model diagram*, shows all of the connections among the datasets. The grey fields represent the primary keys of the datasets. Note that a database *can* have multiple columns to construct a primary key.
+
+This diagram is a great way of communicating the full, detailed structure of your data. It also reinforces the need for **every observed entity** in your study to have its own ID (primary key)!
+
+------------------------------------------------------------------------
+
+There are four main join operations for datasets `x` and `y`:
+
+-   `inner_join()`: includes all rows in `x` **and** `y`
+-   `left_join()`: includes all rows in `x` and *matching* rows in `y`
+-   `right_join()`: includes all *matching* rows in `x` and all rows in `y`
+-   `full_join()`: includes all rows in `x` **or** `y`
+
+`left_`, `right_`, and `full_` are all *outer* joins: "left outer join," "right outer join," and "full outer join."
+
+The following slides will *visually* demonstrate how the joins work. Sometimes these are shown as Venn Diagrams, but that can be misleading when duplicates are involved. These visualizations are all from [Grolemund & Wickham](https://r4ds.had.co.nz/relational-data.html#nycflights13-relational).
+
+------------------------------------------------------------------------
+
+```{r, echo=FALSE}
+knitr::include_graphics("../images/inner-join.png")
+```
+
+------------------------------------------------------------------------
+
+In code, this join would be written as:
+
+```{r inner_join, include=FALSE}
+# Creating x and y
+# NB: the c() function that combines values into single objects
+x <- tibble(key = c(1, 2, 3), val_x = c("x1", "x2", "x3"))
+y <- tibble(key = c(1, 2, 4), val_y = c("y1", "y2", "y3"))
+
+x %>% 
+  inner_join(y, by = "key")
+```
+
+```{r, echo=FALSE}
+flair::decorate("inner_join") %>% 
+  flair::flair('by = "key"')
+```
+
+------------------------------------------------------------------------
+
+## Outer Joins
+
+```{r, echo=FALSE}
+knitr::include_graphics("../images/outer-joins.png")
+```
+
+------------------------------------------------------------------------
+
+## Duplicates in Key Columns
+
+```{r, echo=FALSE}
+knitr::include_graphics("../images/join-duplicates.png")
+```
+
+[Reflection moment]{.violet}: What would happen if there were $m$ rows of missingness in `x`'s `key` and $n$ rows of missingness in `y`'s `key`? What would that mean for data integrity?
+
+------------------------------------------------------------------------
+
+You can also use **multiple columns as a key**, necessary for nested or long-form (e.g. temporal) data.
+
+Suppose we wanted to examine how, on average, adverse weather affected JetBlue's flights -- a necessary calculation for the airline's dispatch team. We'd need to join JFK's `weather` reports to the `flights` log:
+
+```{r}
+flights %>% 
+  filter(origin == "JFK" & carrier == "B6") %>% 
+  inner_join(
+    weather, 
+    by = c("year", "month", "day", "hour", "origin")
+  ) %>% 
+  head(n = 4)
+```
+
+------------------------------------------------------------------------
+
+## Couple Things to Note
+
+```{r, eval=FALSE}
+flights %>% 
+  filter(origin == "JFK" & carrier == "B6") %>% 
+  inner_join(
+    weather, 
+    by = c("year", "month", "day", "hour", "origin")
+  )
+```
+
+**1)** I only filtered for `origin` because of what the help page for `flights` says! Since datasets can be shared in R packages as well, you can access their data dictionaries with the `?` operator (e.g. `?flights`).
+
+**2)** "B6" is from the `airlines` dataset:
+
+```{r}
+airlines %>% filter(carrier == "B6")
+```
+
+[Reflection moment]{.violet}: Why did I use an inner join? Why not use a left outer join?
+
+------------------------------------------------------------------------
+
+# Visually Exploring Your Data
+
+Data wrangling and exploratory data analysis would be incomplete without actually **looking** at your data.
+
+### At this stage, we'll be putting together all we know so far, basic data wrangling and merging to ask all sorts of questions, with [plotting]{.red} to visualize our data.
+
+I'll continue to try to answer "how, on average, adverse weather affected JetBlue's flights" visually to introduce...
+
+------------------------------------------------------------------------
+
+# `ggplot2`
+
+**ggplot2** is a **huge** package dedicated to implementing the Grammar or Graphics in R. The concept is the idea that **everything in a plot is a layer**, from the input data to geometries to statistics to coordinate transformations. This allows users to **compose** together plot features, similar to how the pipe `%>%` composes together functions.
+
+**ggplot2** is already attached since it's provided with the **tidyverse** package.
+
+------------------------------------------------------------------------
+
+# Intro to ggplot2
+
+Let's first look at the `precip` column in `weather`. `precip` is the amount of accumulated precipitation in the last hour of measurement. What does its distribution look like?
+
+```{r}
+jfk_weather <- 
+  weather %>% 
+  filter(origin == "JFK")
+```
+
+To define the input data, we use the `ggplot()` function to start a plot and the `aes()` function to specify the input variables.
+
+```{r jfk_weather_precip, eval=FALSE, out.width=300, out.height=300}
+jfk_weather %>% 
+  ggplot(aes(x = precip))
+```
+
+------------------------------------------------------------------------
+
+`aes(x = )` specifies that this is a 1 variable plot. `aes(x = , y = )` specifies a 2 variable plot.
+
+```{r}
+jfk_weather %>% 
+  ggplot(aes(x = precip)) #<<
+```
+
+An empty plot! Let's add a histogram...
+
+------------------------------------------------------------------------
+
+Histograms (and kinds of plots in general) are a type of **geometry**. We can access geometries with the `geom_*()` functions. Here, I'll use `geom_histogram()`:
+
+```{r jfk_precip_hist, include=FALSE, message=FALSE, out.height=325}
+jfk_weather %>% 
+  ggplot(aes(x = precip)) + # Note the plus!! In ggplot, you "add" layers like a stack.
+  geom_histogram()
+```
+
+```{r, echo=FALSE, message=FALSE}
+flair::decorate("jfk_precip_hist") %>% 
+  flair::flair("+", color = "#c50f3c", bold = TRUE)
+```
+
+------------------------------------------------------------------------
+
+It's pretty clear that most hours of the year had no or very little precipitation. But what about the days where there *was* rain? Let's look at `precip` against `dep_delay` (in seconds) in `flights`. We'll need to join the `weather` data to `flights`!
+
+```{r jfk_flights_weather, include=FALSE}
+jfk_flights_weather <-
+  flights %>% 
+  filter(origin == "JFK") %>% 
+  inner_join(
+    weather %>% 
+      select(-time_hour),                            # Deselect columns with `-`
+    by = c("year", "month", "day", "hour", "origin")
+  )
+```
+
+```{r, echo=FALSE}
+flair::decorate("jfk_flights_weather") %>% 
+  flair::flair("select(-time_hour)")
+```
+
+------------------------------------------------------------------------
+
+Let's double-check that we have `dep_delay` and `precip`...
+
+```{r}
+jfk_flights_weather %>% 
+  filter(precip > 0) %>% 
+  select(dep_delay, precip)
+```
+
+------------------------------------------------------------------------
+
+... And visually let's create a scatter plot with `geom_point()`:
+
+```{r, warning=FALSE, out.height=325}
+jfk_flights_weather %>% 
+  filter(precip > 0) %>% 
+  select(dep_delay, precip) %>% 
+  ggplot(aes(x = precip, y = dep_delay)) +
+  geom_point()
+```
+
+Very dense scatter plot! Let's add a linear fit using the `stat_smooth()` statistic layer for a trendline and add some transparency on the dots to prevent over-plotting.
+
+------------------------------------------------------------------------
+
+```{r}
+jfk_flights_weather %>% 
+  filter(precip > 0) %>% 
+  select(dep_delay, precip) %>% 
+  ggplot(aes(x = precip, y = dep_delay)) +
+  geom_point(alpha = 0.4) +
+  stat_smooth(method = "lm") #<<
+```
+
+`method = "lm"` refers to using the base R linear model `lm()` function that Michael will discuss later!
+
+------------------------------------------------------------------------
+
+```{r}
+jfk_flights_weather %>% 
+  filter(precip > 0) %>% 
+  select(dep_delay, precip) %>% 
+  ggplot(aes(x = precip, y = dep_delay)) +
+  geom_jitter(alpha = 0.4) +
+  stat_smooth(method = "lm") #<<
+```
+
+We can also use a jitter plot to reduce the regularity in the dots and imply that the measurements are not supposed to be on a grid.
+
+------------------------------------------------------------------------
+
+We can show categorical information in several ways. A couple popular methods are with bar plots and different colors.
+
+Let's look at average departure delay each month by airline:
+
+```{r}
+jfk_flights_weather %>% 
+  mutate(carrier = as.factor(carrier)) %>% #<<
+  group_by(carrier, month) %>% 
+  summarize(avg_dep_delay = mean(dep_delay, na.rm = TRUE)) %>% 
+  ggplot(aes(
+    x = month, 
+    y = avg_dep_delay, 
+    color = carrier
+  )) +
+  geom_point()
+```
+
+The `mutate()` statement which converts `carrier` to a factor is necessary since **ggplot2** uses factors for categorical data and does not automatically convert columns passed to the `color` and `fill` parameters.
+
+------------------------------------------------------------------------
+
+```{r}
+current_plot <- jfk_flights_weather %>%
+  left_join(airlines, by = "carrier") %>% 
+  mutate(name = as.factor(name)) %>%
+  group_by(name, month) %>% 
+  summarize(avg_dep_delay = mean(dep_delay, na.rm = TRUE)) %>% 
+  ggplot(aes(
+    x = month, 
+    y = avg_dep_delay, 
+    color = name
+  )) +
+  geom_line()
+
+current_plot
+```
+
+By assigning the plot to a symbol, we can save our work and build upon it in later stages!
+
+To make this publication-ready, we need a few things: a title and good axis labels, some color scale tweaking, and a decent background. I'll adjust those with `labs()` and some `scale\_\*()` and `theme\_\*()` functions from the fun package **ggthemes**.
+
+------------------------------------------------------------------------
+
+```{r}
+current_plot +
+  labs(
+    x = "Month", 
+    y = "Average departure delay (minutes)", 
+    title = "Monthly Trend of Departure Delays from JFK",
+    color = "Airline"
+  ) +
+  ggthemes::theme_clean() +
+  ggthemes::scale_color_calc()
+```
+
+For me, there are too many airlines on this plot -- it looks like spaghetti. Instead, let's split geometries into different plots using `facet_wrap()`...
+
+------------------------------------------------------------------------
+
+```{r}
+jfk_flights_weather %>%
+  left_join(airlines, by = "carrier") %>% 
+  mutate(name = as.factor(name)) %>%
+  group_by(name, month) %>% 
+  summarize(avg_dep_delay = mean(dep_delay, na.rm = TRUE)) %>% 
+  ggplot(aes(
+    x = month, 
+    y = avg_dep_delay
+  )) +
+  geom_line() +
+  facet_wrap(~ name) + #<<
+  labs(
+    x = "Month", 
+    y = "Average departure delay (minutes)", 
+    title = "Monthly Trend of Departure Delays from JFK"
+  ) +
+  ggthemes::theme_clean()
+```
+
+`facet_wrap()` partitions the geometries based on the variable specified after the `~` symbol (in R, this denotes a *formula*. Michael will discuss formulae later).
+
+------------------------------------------------------------------------
+
+# All in all...
+
+**ggplot2** is has an *enormous* amount of power, too much to cover here. Moreover, the topic of data visualization is beyond the scope of this series of workshops. Nevertheless, these are recommended resources for using **ggplot2** and data visualization in R overall:
+
+### [Data Visualization RStudio Cheatsheet](https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf)
+
+*Extremely* handy cheatsheet that covers *most* of what you need to know to work with **ggplot2**. I refer to this almost every time I create plots because I tend to forget which function does what!
+
+### [From Data to Viz](https://www.data-to-viz.com/)
+
+*Beautiful* website that covers data visualization overall, including which situations would require certain kinds of plots and discussions of caveats and traps that people can fall into. The site provides R code snippets for each plot on the site.<sup>1</sup>
+
+(1): It's written using R Markdown!
