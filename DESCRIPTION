@@ -17,4 +17,5 @@ Imports:
     tidyverse,
     nycflights13,
     here,
-    openxlsx
+    openxlsx,
+    ggthemes

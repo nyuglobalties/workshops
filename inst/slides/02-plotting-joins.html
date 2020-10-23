@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Session 2</title>
+    <meta charset="utf-8" />
+    <script src="02-plotting-joins_files/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Session 2
+## Finding Relationships in Your Data
+### Global TIES for Children
+
+---
+
+
+
+
+&lt;style&gt;
+:root {
+  --font12: 12pt;
+  --font10: 10pt;
+  --nyu-yellow: #ecaa00;
+  --nyu-red: #c50f3c;
+  --nyu-violet: #57068c;
+}
+
+.font12 &gt; table {
+  font-size: var(--font12);
+}
+
+.font12 &gt; p {
+  font-size: var(--font12);
+}
+
+.font12 &gt; pre .remark-code-line {
+  font-size: var(--font12);
+}
+
+.font10 &gt; table {
+  font-size: var(--font10);
+}
+
+.font10 &gt; p {
+  font-size: var(--font10);
+}
+
+.font10 &gt; pre .remark-code-line {
+  font-size: var(--font10);
+}
+
+.yellow {
+  color: var(--nyu-yellow);
+}
+
+.red {
+  color: var(--nyu-red);
+}
+
+.violet {
+  color: var(--nyu-violet);
+}
+&lt;/style&gt;
+
+# Last Time
+
+We talked about:
+
+- An introduction to R syntax
+- Loading and viewing your data
+- R's data types
+- Basic data wrangling
+
+---
+
+# Agenda
+
+By the end of this workshop, you should be able to understand this block of code:
+
+
+```r
+dat &lt;- read_csv(here("data/dataset.csv"))
+admin_dat &lt;- read_csv("data/admin.csv")
+
+dat %&gt;% 
+  left_join(
+    admin_dat %&gt;% 
+      select(student_id, registration_date),
+    by = "student_id"
+  ) %&gt;% 
+  ggplot(aes(registration_date)) +
+  geom_histogram() +
+  facet_wrap(~ grade)
+```
+
+---
+
+# Agenda
+
+We'll be covering
+
+- Combining datasets (joins and binding)
+- The wonderful plotting library **ggplot2**
+- R Markdown
+
+For all of this presentation, I will have the Tidyverse attached and our intervention dataset loaded:
+
+
+```r
+suppressPackageStartupMessages(library(tidyverse))
+
+intervention &lt;- read_csv(
+  here::here("data/sample_intervention_dataset.csv"), 
+  col_types = cols()
+)
+```
+
+```
+## Warning: Missing column names filled in: 'X1' [1]
+```
+
+The `col_types = cols()` parameter suppresses the **readr** column specification.
+
+---
+class: inverse, middle, center
+
+# Combining Data to Make New Data
+
+## 📦
+
+---
+
+# Combination Methods
+
+There are two main kinds of combining datasets together:
+
+1. **Binding** datasets, either binding rows or columns together
+1. **Joining** (or  **merging**) datasets based on shared information
+
+**Binding** is useful for combining _similarly structured_ data.
+
+**Joining** is the more general case where the datasets need not have similar structure but _must_ have a common variable (or set of variables).
+
+---
+
+# Binding
+
+The two primary commands relate to the two _dimensions_ of how you can bind data: `bind_rows()` and `bind_cols()` (both from **dplyr**). 
+
+I'll only be discussing `bind_rows()` since `bind_cols()` is _very rarely_ the right way to add variables from other datasets into a working dataset, _and_ it can be a &lt;span class="red"&gt;brittle and potentially dangerous&lt;/span&gt; operation.
+
+To motivate the use of `bind_rows()`, I will split the intervention dataset into two datasets, each with its own cohort:
+
+
+```r
+cohort_a &lt;- intervention %&gt;% filter(Cohort == "A")
+cohort_b &lt;- intervention %&gt;% filter(Cohort == "B")
+```
+
+Row binding is useful when you have _multiple versions_ of the same (or similar) datasets and you'd like to combine them into one.
+
+---
+
+# Binding
+
+To verify we have different datasets, let's take a peek at them...
+
+
+```r
+head(cohort_a, 2)
+```
+
+```
+## # A tibble: 2 x 9
+##      X1 Coded_ID Cohort Intervention Female Final_grade Final_score
+##   &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1     1        1 A                -1      1         3.7        83.1
+## 2     2        2 A                 1      0         2.7        70.8
+## # … with 2 more variables: Baseline_math_score &lt;dbl&gt;,
+## #   Baseline_stereotype_endorsement &lt;dbl&gt;
+```
+
+
+```r
+head(cohort_b, 2)
+```
+
+```
+## # A tibble: 2 x 9
+##      X1 Coded_ID Cohort Intervention Female Final_grade Final_score
+##   &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1    46        4 B                 1      1         3.7        85.2
+## 2    47        5 B                 1      0         2.7        73.9
+## # … with 2 more variables: Baseline_math_score &lt;dbl&gt;,
+## #   Baseline_stereotype_endorsement &lt;dbl&gt;
+```
+
+---
+
+# Binding
+
+... and now bound together:
+
+
+```r
+set.seed(1283) # Always set an RNG seed to get reproducible results!
+
+bind_rows(cohort_a, cohort_b) %&gt;% 
+  slice_sample(n = 5)
+```
+
+```
+## # A tibble: 5 x 9
+##      X1 Coded_ID Cohort Intervention Female Final_grade Final_score
+##   &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1    67       44 B                 1      0         4          92.7
+## 2    49        8 B                 1      1         0.7        38.6
+## 3    41       87 A                 1      0         1          40.3
+## 4    76       57 B                -1      0         3.7        84.8
+## 5    53       15 B                -1      1         0.7        38.9
+## # … with 2 more variables: Baseline_math_score &lt;dbl&gt;,
+## #   Baseline_stereotype_endorsement &lt;dbl&gt;
+```
+
+`slice_sample()` is a function from **dplyr** that picks rows at random, a derivative of `slice()` which filters the dataset to a specific row number range.
+
+---
+
+# Binding
+
+By default, the row binding operation matches columns based on column order (i.e. match column 1 in `cohort_a` to column 1 in `cohort_b`, 2 to 2, and so on). 
+
+If the two datasets have **slightly different** columns (like, reordered columns or some missing columns), `bind_rows()` takes care of this situation by **matching by column _name_**.
+
+---
+
+# Binding
+
+To show this, I'll create a different `cohort_b` with some dropped and reordered columns from `cohort_b`.
+
+
+```r
+different_cohort_b &lt;-
+  cohort_b %&gt;% 
+  select(Coded_ID, Intervention:Final_score)
+```
+
+
+
+
+The columns of `cohort_b` are `X1`, `Coded_ID`, `Cohort`, `Intervention`, `Female`, `Final_grade`, `Final_score`, `Baseline_math_score`, and `Baseline_stereotype_endorsement`...
+
+...whereas the columns of `different_cohort_b` are `Coded_ID`, `Intervention`, `Female`, `Final_grade`, and `Final_score`.
+
+---
+
+# Binding
+
+Row binding them together:
+
+
+```r
+cohort_b %&gt;% 
+  head(n = 3) %&gt;% 
+  bind_rows(head(different_cohort_b, 3))
+```
+
+```
+## # A tibble: 6 x 9
+##      X1 Coded_ID Cohort Intervention Female Final_grade Final_score
+##   &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+## 1    46        4 B                 1      1         3.7        85.2
+## 2    47        5 B                 1      0         2.7        73.9
+## 3    48        7 B                -1      1         2.3        70.7
+## 4    NA        4 &lt;NA&gt;              1      1         3.7        85.2
+## 5    NA        5 &lt;NA&gt;              1      0         2.7        73.9
+## 6    NA        7 &lt;NA&gt;             -1      1         2.3        70.7
+## # … with 2 more variables: Baseline_math_score &lt;dbl&gt;,
+## #   Baseline_stereotype_endorsement &lt;dbl&gt;
+```
+
+Note how `X1` and `Cohort` are filled in with **missingness** (shown as NA) since they don't exist in `different_cohort_b`.
+
+---
+
+# Joining &amp; Relational Data
+
+Unlike stacking similar data into a single dataset with row binding, **joining** or **merging** is **the** way to the bring variables from other datasets together&lt;sup&gt;1&lt;/sup&gt; based on some shared information called **keys**.
+
+There are two major kinds of keys and one minor but important one to remember:
+
+1. **Primary keys**: Columns that uniquely identify each observed entity in your current dataset (major)
+1. **Foreign keys**: Columns that uniquely identify entities in _different_ datasets, e.g. a school ID in a child-level dataset (major)
+1. **Surrogate keys**: Columns that uniquely identify _each row_ (no duplicates!), e.g. a random serial number for each survey submission (minor but important)
+
+Datasets that have these keys that form relations among each other are called **relational data**. 
+
+.footnote.font10[
+
+(1): _Column_ binding assumes that the row order _and_ meaning is same among column-bound datasets which is _very_ rarely the case.  This is why it's better to use joins.
+
+]
+
+---
+
+# Joining &amp; Relational Data
+
+To demonstrate joins, I'll be using the `nycflights13` dataset like _R for Data Science_.
+
+
+```r
+library(nycflights13)
+```
+
+It has 5 datasets:
+
+- `flights`: A log of all flights _from_ the New York area (JFK, LGA, and EWR) in 2013
+- `airlines`: Information on each airline (primary key is `carrier`)
+- `airports`: Information on each airport in the flight log (primary key is `faa`)
+- `planes`: Information on each plane itself (primary key is `tailnum`)
+- `weather`: Hourly readings of the weather at each NY area airport
+
+---
+
+# Joining &amp; Relational Data
+
+.center[
+
+&lt;img src="../images/relational-nycflights.png" width="400" /&gt;
+
+.font10[
+  
+Source: [Grolemund &amp; Wickham](https://r4ds.had.co.nz/relational-data.html#nycflights13-relational)
+  
+]
+
+]
+
+This image, a _relational model diagram_, shows all of the connections among the datasets. The grey fields represent the primary keys of the datasets. Note that a database _can_ have multiple columns to construct a primary key.
+
+This diagram is a great way of communicating the full, detailed structure of your data. It also reinforces the need for **every observed entity** in your study to have its own ID (primary key)!
+
+---
+
+# Joining &amp; Relational Data
+
+There are four main join operations for datasets `x` and `y`:
+
+- `inner_join()`: includes all rows in `x` **and** `y`
+- `left_join()`: includes all rows in `x` and _matching_ rows in `y`
+- `right_join()`: includes all _matching_ rows in `x` and all rows in `y`
+- `full_join()`: includes all rows in `x` **or** `y`
+
+`left_`, `right_`, and `full_` are all _outer_ joins: "left outer join," "right outer join," and "full outer join."
+
+The following slides will _visually_ demonstrate how the joins work. Sometimes these are shown as Venn Diagrams, but that can be misleading when duplicates are involved. These visualizations are all from [Grolemund &amp; Wickham](https://r4ds.had.co.nz/relational-data.html#nycflights13-relational).
+
+---
+background-image: url('../images/inner-join.png')
+
+---
+class: middle
+
+In code, this join would be written as:
+
+
+
+
+&lt;code class ='r hljs remark-code'&gt;# Creating x and y&lt;br&gt;# NB: the c() function that combines values into single objects&lt;br&gt;x &lt;- tibble(key = c(1, 2, 3), val_x = c("x1", "x2", "x3"))&lt;br&gt;y &lt;- tibble(key = c(1, 2, 4), val_y = c("y1", "y2", "y3"))&lt;br&gt;&lt;br&gt;x %&gt;% &lt;br&gt;&amp;nbsp;&amp;nbsp;inner_join(y, &lt;span style="background-color:#ffff7f"&gt;by = "key"&lt;/span&gt;)&lt;/code&gt;
+
+```
+
+## # A tibble: 2 x 3
+##     key val_x val_y
+##   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;
+## 1     1 x1    y1   
+## 2     2 x2    y2
+
+```
+
+---
+background-image: url('../images/outer-joins.png')
+
+## Outer Joins
+
+---
+background-image: url('../images/join-duplicates.png')
+
+## Duplicates in Key Columns
+
+.footnote[
+
+&lt;span class="violet"&gt;Reflection moment&lt;/span&gt;: What would happen if there were `\(m\)` rows of missingness in `x`'s `key` and `\(n\)` rows of missingness in `y`'s `key`? What would that mean for data integrity?
+
+]
+
+---
+
+# Joining &amp; Relational Data
+
+.font12[
+
+You can also use **multiple columns as a key**, necessary for nested or long-form (e.g. temporal) data.
+
+Suppose we wanted to examine how, on average, adverse weather affected JetBlue's flights -- a necessary calculation for the airline's dispatch team. We'd need to join JFK's `weather` reports to the `flights` log:
+
+]
+
+.font10[
+
+
+```r
+flights %&gt;% 
+  filter(origin == "JFK" &amp; carrier == "B6") %&gt;% 
+  inner_join(
+    weather, 
+    by = c("year", "month", "day", "hour", "origin")
+  ) %&gt;% 
+  head(n = 4)
+```
+
+```
+## # A tibble: 4 x 29
+##    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
+## 1  2013     1     1      544            545        -1     1004           1022
+## 2  2013     1     1      557            600        -3      838            846
+## 3  2013     1     1      558            600        -2      849            851
+## 4  2013     1     1      558            600        -2      853            856
+## # … with 21 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
+## #   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
+## #   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour.x &lt;dttm&gt;, temp &lt;dbl&gt;, dewp &lt;dbl&gt;,
+## #   humid &lt;dbl&gt;, wind_dir &lt;dbl&gt;, wind_speed &lt;dbl&gt;, wind_gust &lt;dbl&gt;,
+## #   precip &lt;dbl&gt;, pressure &lt;dbl&gt;, visib &lt;dbl&gt;, time_hour.y &lt;dttm&gt;
+```
+
+]
+
+---
+
+## Couple Things to Note
+
+.font10[
+
+
+```r
+flights %&gt;% 
+  filter(origin == "JFK" &amp; carrier == "B6") %&gt;% 
+  inner_join(
+    weather, 
+    by = c("year", "month", "day", "hour", "origin")
+  )
+```
+
+]
+
+**1)** I only filtered for `origin` because of what the help page for `flights` says! Since datasets can be shared in R packages as well, you can access their data dictionaries with the `?` operator (e.g. `?flights`).
+
+**2)** "B6" is from the `airlines` dataset:
+
+.font10[
+
+
+```r
+airlines %&gt;% filter(carrier == "B6")
+```
+
+```
+## # A tibble: 1 x 2
+##   carrier name           
+##   &lt;chr&gt;   &lt;chr&gt;          
+## 1 B6      JetBlue Airways
+```
+
+]
+
+&lt;span class="violet"&gt;Reflection moment&lt;/span&gt;: Why did I use an inner join? Why not use a left outer join?
+
+---
+class: middle, center, inverse
+
+# Visually Exploring Your Data
+
+## 📊📉
+
+---
+
+# Putting It All Together
+
+Data wrangling and exploratory data analysis would be incomplete without actually **looking** at your data.
+
+### At this stage, we'll be putting together all we know so far, basic data wrangling and merging to ask all sorts of questions, with &lt;span class="red"&gt;plotting&lt;/span&gt; to visualize our data.
+
+I'll continue to try to answer "how, on average, adverse weather affected JetBlue's flights" visually to introduce...
+
+---
+
+.center[
+
+# `ggplot2`
+
+]
+
+**ggplot2** is a **huge** package dedicated to implementing the Grammar or Graphics in R. The concept is the idea that **everything in a plot is a layer**, from the input data to geometries to statistics to coordinate transformations. This allows users to **compose** together plot features, similar to how the pipe `%&gt;%` composes together functions.
+
+**ggplot2** is already attached since it's provided with the **tidyverse** package.
+
+---
+
+# Intro to ggplot2
+
+Let's first look at the `precip` column in `weather`. `precip` is the amount of accumulated precipitation in the last hour of measurement. What does its distribution look like?
+
+
+```r
+jfk_weather &lt;- 
+  weather %&gt;% 
+  filter(origin == "JFK")
+```
+
+To define the input data, we use the `ggplot()` function to start a plot and the `aes()` function to specify the input variables.
+
+
+```r
+jfk_weather %&gt;% 
+  ggplot(aes(x = precip))
+```
+
+---
+
+# Intro to ggplot2
+
+`aes(x = )` specifies that this is a 1 variable plot. `aes(x = , y = )` specifies a 2 variable plot.
+
+.pull-left[
+
+.font10[
+
+
+```r
+jfk_weather %&gt;% 
+* ggplot(aes(x = precip))
+```
+
+]
+
+]
+
+.pull-right[
+
+&lt;img src="02-plotting-joins_files/figure-html/unnamed-chunk-18-1.png" width="300" height="300" /&gt;
+
+
+An empty plot! Let's add a histogram...
+
+]
+
+---
+
+# Intro to ggplot2
+
+Histograms (and kinds of plots in general) are a type of **geometry**. We can access geometries with the `geom_*()` functions. Here, I'll use `geom_histogram()`:
+
+.font10[
+
+
+
+
+&lt;code class ='r hljs remark-code'&gt;jfk_weather %&gt;% &lt;br&gt;&amp;nbsp;&amp;nbsp;ggplot(aes(x = precip)) &lt;span style="color:#c50f3c;text-weight:bold"&gt;+&lt;/span&gt; # Note the plus!! In ggplot, you "add" layers like a stack.&lt;br&gt;&amp;nbsp;&amp;nbsp;geom_histogram()&lt;/code&gt;
+
+
+&lt;img src="02-plotting-joins_files/figure-html/unnamed-chunk-36-1.png" height="325" /&gt;
+
+]
+
+---
+
+# Intro to ggplot2
+
+It's pretty clear that most hours of the year had no or very little precipitation. But what about the days where there _was_ rain? Let's look at `precip` against `dep_delay` (in seconds) in `flights`. We'll need to join the `weather` data to `flights`!
+
+.font10[
+
+
+
+&lt;code class ='r hljs remark-code'&gt;jfk_flights_weather &lt;-&lt;br&gt;&amp;nbsp;&amp;nbsp;flights %&gt;% &lt;br&gt;&amp;nbsp;&amp;nbsp;filter(origin == "JFK") %&gt;% &lt;br&gt;&amp;nbsp;&amp;nbsp;inner_join(&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;weather %&gt;% &lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style="background-color:#ffff7f"&gt;select(-time_hour)&lt;/span&gt;, &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;# Deselect columns with `-`&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;by = c("year", "month", "day", "hour", "origin")&lt;br&gt;&amp;nbsp;&amp;nbsp;)&lt;/code&gt;
+
+]
+
+---
+
+# Intro to ggplot2
+
+Let's double-check that we have `dep_delay` and `precip`...
+
+.font10[
+
+
+```r
+jfk_flights_weather %&gt;% 
+  filter(precip &gt; 0) %&gt;% 
+  select(dep_delay, precip)
+```
+
+```
+## # A tibble: 7,266 x 2
+##    dep_delay precip
+##        &lt;dbl&gt;  &lt;dbl&gt;
+##  1        12   0.02
+##  2        20   0.02
+##  3        -8   0.03
+##  4        -3   0.03
+##  5        -2   0.03
+##  6         0   0.03
+##  7        -4   0.03
+##  8         3   0.03
+##  9         4   0.03
+## 10         9   0.03
+## # … with 7,256 more rows
+```
+
+]
+
+---
+
+# Intro to ggplot2
+
+... And visually let's create a scatter plot with `geom_point()`:
+
+.pull-left[
+
+.font10[
+
+
+```r
+jfk_flights_weather %&gt;% 
+  filter(precip &gt; 0) %&gt;% 
+  select(dep_delay, precip) %&gt;% 
+  ggplot(aes(x = precip, y = dep_delay)) +
+  geom_point()
+```
+
+&lt;img src="02-plotting-joins_files/figure-html/unnamed-chunk-22-1.png" height="325" /&gt;
+
+]
+
+]
+
+.pull-right[
+
+Very dense scatter plot! Let's add a linear fit using the `stat_smooth()` statistic layer for a trendline and add some transparency on the dots to prevent over-plotting.
+
+]
+
+---
+
+# Intro to ggplot2
+
+.pull-left[
+
+
+```r
+jfk_flights_weather %&gt;% 
+  filter(precip &gt; 0) %&gt;% 
+  select(dep_delay, precip) %&gt;% 
+  ggplot(aes(x = precip, y = dep_delay)) +
+  geom_point(alpha = 0.4) +
+* stat_smooth(method = "lm")
+```
+
+`method = "lm"` refers to using the base R linear model `lm()` function that Michael will discuss later!
+
+]
+
+.pull-right[
+
+![](02-plotting-joins_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+# Intro to ggplot2
+
+.pull-left[
+
+
+```r
+jfk_flights_weather %&gt;% 
+  filter(precip &gt; 0) %&gt;% 
+  select(dep_delay, precip) %&gt;% 
+  ggplot(aes(x = precip, y = dep_delay)) +
+  geom_jitter(alpha = 0.4) +
+* stat_smooth(method = "lm")
+```
+
+We can also use a jitter plot to reduce the regularity in the dots and imply that the measurements are not supposed to be on a grid.
+
+]
+
+.pull-right[
+
+![](02-plotting-joins_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+# Intro to ggplot2
+
+We can show categorical information in several ways. A couple popular methods are with bar plots and different colors.
+
+Let's look at average departure delay each month by airline:
+
+.pull-left[
+
+.font10[
+
+
+```r
+jfk_flights_weather %&gt;% 
+* mutate(carrier = as.factor(carrier)) %&gt;%
+  group_by(carrier, month) %&gt;% 
+  summarize(avg_dep_delay = mean(dep_delay, na.rm = TRUE)) %&gt;% 
+  ggplot(aes(
+    x = month, 
+    y = avg_dep_delay, 
+    color = carrier
+  )) +
+  geom_point()
+```
+
+The `mutate()` statement which converts `carrier` to a factor is necessary since **ggplot2** uses factors for categorical data and does not automatically convert columns passed to the `color` and `fill` parameters.
+
+]
+
+]
+
+.pull-right[
+
+![](02-plotting-joins_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+# Intro to ggplot2
+
+.pull-left[
+
+.font10[
+
+
+```r
+current_plot &lt;- jfk_flights_weather %&gt;%
+  left_join(airlines, by = "carrier") %&gt;% 
+  mutate(name = as.factor(name)) %&gt;%
+  group_by(name, month) %&gt;% 
+  summarize(avg_dep_delay = mean(dep_delay, na.rm = TRUE)) %&gt;% 
+  ggplot(aes(
+    x = month, 
+    y = avg_dep_delay, 
+    color = name
+  )) +
+  geom_line()
+
+current_plot
+```
+
+By assigning the plot to a symbol, we can save our work and build upon it in later stages!
+
+]
+
+To make this publication-ready, we need a few things: a title and good axis labels, some color scale tweaking, and a decent background. I'll adjust those with `labs()` and some `scale\_\*()` and `theme\_\*()` functions from the fun package **ggthemes**.
+
+]
+
+.pull-right[
+
+![](02-plotting-joins_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+# Intro to ggplot2
+
+.pull-left[
+
+.font10[
+
+
+```r
+current_plot +
+  labs(
+    x = "Month", 
+    y = "Average departure delay (minutes)", 
+    title = "Monthly Trend of Departure Delays from JFK",
+    color = "Airline"
+  ) +
+  ggthemes::theme_clean() +
+  ggthemes::scale_color_calc()
+```
+
+]
+
+For me, there are too many airlines on this plot -- it looks like spaghetti. Instead, let's split geometries into different plots using `facet_wrap()`...
+
+]
+
+.pull-right[
+
+![](02-plotting-joins_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+# Intro to ggplot2
+
+.pull-left[
+
+.font10[
+
+
+```r
+jfk_flights_weather %&gt;%
+  left_join(airlines, by = "carrier") %&gt;% 
+  mutate(name = as.factor(name)) %&gt;%
+  group_by(name, month) %&gt;% 
+  summarize(avg_dep_delay = mean(dep_delay, na.rm = TRUE)) %&gt;% 
+  ggplot(aes(
+    x = month, 
+    y = avg_dep_delay
+  )) +
+  geom_line() +
+* facet_wrap(~ name) +
+  labs(
+    x = "Month", 
+    y = "Average departure delay (minutes)", 
+    title = "Monthly Trend of Departure Delays from JFK"
+  ) +
+  ggthemes::theme_clean()
+```
+
+`facet_wrap()` partitions the geometries based on the variable specified after the `~` symbol (in R, this denotes a _formula_. Michael will discuss formulae later).
+
+]
+
+]
+
+.pull-right[
+
+![](02-plotting-joins_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+# All in all...
+
+**ggplot2** is has an _enormous_ amount of power, too much to cover here. Moreover, the topic of data visualization is beyond the scope of this series of workshops. Nevertheless, these are recommended resources for using **ggplot2** and data visualization in R overall:
+
+.pull-left[
+
+### [Data Visualization RStudio Cheatsheet](https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf)
+
+_Extremely_ handy cheatsheet that covers _most_ of what you need to know to work with **ggplot2**. I refer to this almost every time I create plots because I tend to forget which function does what!
+
+]
+
+.pull-right[
+
+### [From Data to Viz](https://www.data-to-viz.com/)
+
+_Beautiful_ website that covers data visualization overall, including which situations would require certain kinds of plots and discussions of caveats and traps that people can fall into. The site provides R code snippets for each plot on the site.&lt;sup&gt;1&lt;/sup&gt;
+
+]
+
+.footnote.font10[
+
+(1): It's written using R Markdown!
+
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"highlightLines": true,
+"highlightStyle": "solarized-light"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
