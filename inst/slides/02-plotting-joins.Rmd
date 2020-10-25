@@ -936,6 +936,27 @@ jfk_flights_weather %>%
 
 ---
 
+# `esquisse`
+
+If this amount of control is a bit daunting and you just want to play around with _possible_ visualizations, I recommend using the **esquisse** package.
+
+.center[
+
+## _Demo_
+
+]
+
+Type
+
+```{r, eval=FALSE}
+esquisse::esquisser()
+```
+
+into the console!
+
+
+---
+
 # All in all...
 
 **ggplot2** has an _enormous_ amount of power, too much to cover here. Moreover, the topic of data visualization is beyond the scope of this series of workshops. Nevertheless, these are recommended resources for using **ggplot2** and data visualization in R overall:

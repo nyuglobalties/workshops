@@ -18,4 +18,5 @@ Imports:
     nycflights13,
     here,
     openxlsx,
-    ggthemes
+    ggthemes,
+    esquisse
