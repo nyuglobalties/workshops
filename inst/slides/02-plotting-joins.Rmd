@@ -506,6 +506,72 @@ airlines %>% filter(carrier == "B6")
 <span class="violet">Reflection moment</span>: Why did I use an inner join? Why not use a left outer join?
 
 ---
+
+# Recap
+
+.pull-left[
+
+
+Suppose I have a dataset `school_db` that has a primary key column `school_id` and some information about each school, and suppose I have a survey of schoolchildren across multiple schools `survey` with primary key column `child_id` and foreign key column `school_id`. How would I combine the school data into the survey?
+
+]
+
+.pull-right.font10[
+
+```{r, eval=FALSE}
+# 1.
+survey %>% 
+  inner_join(school_db, by = "school_id")
+
+# 2.
+survey %>% 
+  bind_rows(school_db)
+
+# 3.
+school_db %>% 
+  left_join(survey, by = "child_id")
+
+# 4.
+survey %>% 
+  left_join(school_db, by = "school_id")
+```
+
+]
+
+---
+
+# Recap
+
+.pull-left[
+
+
+Suppose I have a dataset `school_db` that has a primary key column `school_id` and some information about each school, and suppose I have a survey of schoolchildren across multiple schools `survey` with primary key column `child_id` and foreign key column `school_id`. How would I combine the school data into the survey?
+
+]
+
+.pull-right.font10[
+
+```{r, eval=FALSE}
+# 1.
+survey %>% 
+  inner_join(school_db, by = "school_id")
+
+# 2.
+survey %>% 
+  bind_rows(school_db)
+
+# 3.
+school_db %>% 
+  left_join(survey, by = "child_id")
+
+# 4.
+survey %>% #<<
+  left_join(school_db, by = "school_id") #<<
+```
+
+]
+
+---
 class: middle, center, inverse
 
 # Visually Exploring Your Data
@@ -938,7 +1004,7 @@ jfk_flights_weather %>%
 
 # `esquisse`
 
-If this amount of control is a bit daunting and you just want to play around with _possible_ visualizations, I recommend using the **esquisse** package.
+If you just want to play around with _possible_ visualizations, I recommend using the **esquisse** package.
 
 .center[
 
@@ -953,7 +1019,6 @@ esquisse::esquisser()
 ```
 
 into the console!
-
 
 ---
 
