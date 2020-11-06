@@ -1047,3 +1047,9 @@ _Beautiful_ website that covers data visualization overall, including which situ
 (1): It's written using R Markdown!
 
 ]
+
+---
+
+# Exercise
+
+Suppose you examine the final score by intervention group. Consult [From Data to Viz](https://www.data-to-viz.com/), and then construct a plot that looks at this relationship. Include any other variables that you deem necessary / interesting!

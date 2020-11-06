@@ -585,3 +585,9 @@ jfk_flights_weather %>%
 *Beautiful* website that covers data visualization overall, including which situations would require certain kinds of plots and discussions of caveats and traps that people can fall into. The site provides R code snippets for each plot on the site.<sup>1</sup>
 
 (1): It's written using R Markdown!
+
+------------------------------------------------------------------------
+
+# Exercise
+
+Suppose you examine the final score by intervention group. Consult [From Data to Viz](https://www.data-to-viz.com/), and then construct a plot that looks at this relationship. Include any other variables that you deem necessary / interesting!
