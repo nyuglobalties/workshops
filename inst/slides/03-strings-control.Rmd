@@ -141,7 +141,7 @@ We'll be covering
 - Pattern matching
 - String manipulation
 - Functions
-- Control flow
+- Iteration, a subsection of control flow
 
 I'll have the **tidyverse** meta-package attached throughout the presentation.
 
