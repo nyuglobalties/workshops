@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Session 3</title>
+    <meta charset="utf-8" />
+    <script src="03-strings-control_files/header-attrs/header-attrs.js"></script>
+    <script src="03-strings-control_files/htmlwidgets/htmlwidgets.js"></script>
+    <link href="03-strings-control_files/str_view/str_view.css" rel="stylesheet" />
+    <script src="03-strings-control_files/str_view-binding/str_view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Session 3
+## Making R Work For You: Strings &amp; Control Flow
+### Global TIES for Children
+
+---
+
+
+
+
+&lt;style&gt;
+:root {
+  --font12: 12pt;
+  --font10: 10pt;
+  --font2: 2pt;
+  --nyu-yellow: #ecaa00;
+  --nyu-red: #c50f3c;
+  --nyu-violet: #57068c;
+}
+
+.font12 &gt; table {
+  font-size: var(--font12);
+}
+
+.font12 &gt; p {
+  font-size: var(--font12);
+}
+
+.font12 &gt; pre .remark-code-line {
+  font-size: var(--font12);
+}
+
+.font10 &gt; table {
+  font-size: var(--font10);
+}
+
+.font10 &gt; p {
+  font-size: var(--font10);
+}
+
+.font10 &gt; pre .remark-code-line {
+  font-size: var(--font10);
+}
+
+.font10 &gt; pre {
+  font-size: var(--font10);
+}
+
+.font2 &gt; pre {
+  font-size: var(--font2);
+}
+
+.font10 .str_view {
+  font-size: var(--font10);
+}
+
+.font10.rendered &gt; pre {
+  font-size: var(--font10);
+  font-family: var(--code-font-family);
+  background-color: #fdf6e3;
+  color: #657b83;
+  padding: 5px;
+}
+
+.yellow {
+  color: var(--nyu-yellow);
+}
+
+.red {
+  color: var(--nyu-red);
+}
+
+.violet {
+  color: var(--nyu-violet);
+}
+
+.highlighted {
+  background-color: var(--code-highlight-color);
+}
+
+.highlighted-block {
+  font-family: var(--code-font-family), Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+}
+
+&lt;/style&gt;
+
+# Last Time
+
+We talked about:
+
+- Row-binding
+- Joins
+- Relational data models
+- Overview of data visualization with ggplot2
+
+---
+
+# Agenda
+
+By the end of this workshop, you should be able to understand this block of code:
+
+
+```r
+func &lt;- function(x) {
+  prefixes &lt;- stringr::str_subset(x, "^[a-zA-Z0-9]+_")
+  prefixes &lt;- stringr::str_replace(prefixes, "_.*$", "")
+  
+  paste0(prefixes, collapse = ",")
+}
+
+words &lt;- c(
+  "CS1_001",
+  "CS1_002",
+  "Not matched"
+)
+
+func(words)
+```
+
+```
+## [1] "CS1,CS1"
+```
+
+---
+
+# Agenda
+
+We'll be covering
+
+- Pattern matching
+- String manipulation
+- Functions
+- Control flow
+
+I'll have the **tidyverse** meta-package attached throughout the presentation.
+
+
+```r
+library(tidyverse)
+```
+
+---
+class: inverse, middle, center
+
+# Words, words, words
+
+## 📜 💀
+
+---
+
+
+
+
+# Pattern Matching
+
+Strings are **frequently messy** in your raw data -- typos, inconsistent date entry, etc. Managing string data requires the use of **regular expressions**, a well-defined grammar that allows for pattern matching.
+
+Let's look at some basic regular expressions. To identify matching sequences, we'll be using `str_view_all()` from the **stringr** package, a member of the Tidyverse.
+
+.pull-left.font10[
+
+
+```r
+str_view_all(
+  c("hi world", "hihi"),
+  "hi"
+)
+```
+
+All `str_*` functions follow a pattern where the first argument are the test strings, and the second argument is the pattern.
+
+Note that there can be _multiple_ matching character sequences in a string.
+
+]
+
+.pull-right.font10[
+
+<div id="htmlwidget-84fc3c5ebca00a251efd" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-84fc3c5ebca00a251efd">{"x":{"html":"<ul>\n  <li><span class='match'>hi<\/span> world<\/li>\n  <li><span class='match'>hi<\/span><span class='match'>hi<\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+]
+
+---
+
+# Pattern Matching
+
+Regular expressions (regex) are a sequence of **tokens**. All alphanumeric characters are tokens, including a few other sequences:
+
+.pull-left.font10[
+
+
+```r
+"\\d" # Digit
+"\\w" # Alphanumerics, including _
+"\\s" # Whitespace
+"."   # ANY character except newline
+"\\." # A period / full-stop.
+```
+
+The `\\` is R's way of "escaping" the backslash character, which is used in non-regex sequences for significant characters, like '\\n' which signals a "newline" character. 
+
+The prefix '\\U' is used for Unicode characters&lt;sup&gt;1&lt;/sup&gt;, like '\\U1F913' which translates to 🤓.
+
+In the case of "\\\\.", the escaped backslash tells the regular expression to treat `.` not as a special token but as a _literal_ dot. You can do the same with other special tokens like `+` and `$` (which we'll get to shortly).
+
+]
+
+.pull-right.font10[
+
+<div id="htmlwidget-f28b28802ba2b9b14a3f" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-f28b28802ba2b9b14a3f">{"x":{"html":"<ul>\n  <li>Any digit: <span class='match'>1<\/span>a<span class='match'>2<\/span>b<span class='match'>4<\/span><span class='match'>5<\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-71065e48a97489642867" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-71065e48a97489642867">{"x":{"html":"<ul>\n  <li><span class='match'>A<\/span><span class='match'>l<\/span><span class='match'>l<\/span> <span class='match'>a<\/span><span class='match'>l<\/span><span class='match'>p<\/span><span class='match'>h<\/span><span class='match'>a<\/span><span class='match'>n<\/span><span class='match'>u<\/span><span class='match'>m<\/span><span class='match'>e<\/span><span class='match'>r<\/span><span class='match'>i<\/span><span class='match'>c<\/span> <span class='match'>c<\/span><span class='match'>h<\/span><span class='match'>a<\/span><span class='match'>r<\/span><span class='match'>a<\/span><span class='match'>c<\/span><span class='match'>t<\/span><span class='match'>e<\/span><span class='match'>r<\/span><span class='match'>s<\/span>, <span class='match'>i<\/span><span class='match'>n<\/span><span class='match'>c<\/span><span class='match'>l<\/span><span class='match'>u<\/span><span class='match'>d<\/span><span class='match'>i<\/span><span class='match'>n<\/span><span class='match'>g<\/span> <span class='match'>_<\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-030a2b1eae00e32f8bee" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-030a2b1eae00e32f8bee">{"x":{"html":"<ul>\n  <li>All<span class='match'> <\/span>whitespace<span class='match'> <\/span>(spaces,<span class='match'> <\/span>tabs,<span class='match'> <\/span>new<span class='match'> <\/span>lines)<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-83948038bc099c80cd2a" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-83948038bc099c80cd2a">{"x":{"html":"<ul>\n  <li><span class='match'>A<\/span><span class='match'>N<\/span><span class='match'>Y<\/span><span class='match'> <\/span><span class='match'>c<\/span><span class='match'>h<\/span><span class='match'>a<\/span><span class='match'>r<\/span><span class='match'>a<\/span><span class='match'>c<\/span><span class='match'>t<\/span><span class='match'>e<\/span><span class='match'>r<\/span><span class='match'> <\/span><span class='match'>e<\/span><span class='match'>x<\/span><span class='match'>c<\/span><span class='match'>e<\/span><span class='match'>p<\/span><span class='match'>t<\/span><span class='match'> <\/span><span class='match'>n<\/span><span class='match'>e<\/span><span class='match'>w<\/span><span class='match'>l<\/span><span class='match'>i<\/span><span class='match'>n<\/span><span class='match'>e<\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-5915579fd37bbfee2362" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5915579fd37bbfee2362">{"x":{"html":"<ul>\n  <li>A period/full-stop<span class='match'>.<\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+]
+
+.footnote.font10[
+
+(1): Technically, this is for the 4-byte Unicode characters, to which the emoji belong. Use '\\u' for the 2-byte characters (if the Unicode hex code only has 4 characters).
+
+]
+
+---
+
+# Pattern Matching
+
+If you want to match multiple tokens/characters, use the `*`, `+`, and `{}` suffix tokens. Use `?` to _optionally_ look for a pattern (zero or one matches)
+
+.pull-left.font10[
+
+
+```r
+"a+"       # One or more 'a' characters
+"z*"       # Zero or more 'z' characters
+"\\d{2,3}" # Between 2 and 3 digits
+"\\w{5}"   # 5 contiguous letters
+"b?"       # Zero or one b characters
+```
+
+]
+
+.pull-right.font10[
+
+<div id="htmlwidget-33687564f6d10edd96ad" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-33687564f6d10edd96ad">{"x":{"html":"<ul>\n  <li>One or more ch<span class='match'>a<\/span>r<span class='match'>a<\/span>cters: b<span class='match'>aa<\/span>b<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-5f5c13fafabaadeb0427" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-5f5c13fafabaadeb0427">{"x":{"html":"<ul>\n  <li><span class='match'><\/span>Z<span class='match'><\/span>e<span class='match'><\/span>r<span class='match'><\/span>o<span class='match'><\/span> <span class='match'><\/span>o<span class='match'><\/span>r<span class='match'><\/span> <span class='match'><\/span>m<span class='match'><\/span>o<span class='match'><\/span>r<span class='match'><\/span>e<span class='match'><\/span> <span class='match'><\/span>c<span class='match'><\/span>h<span class='match'><\/span>a<span class='match'><\/span>r<span class='match'><\/span>a<span class='match'><\/span>c<span class='match'><\/span>t<span class='match'><\/span>e<span class='match'><\/span>r<span class='match'><\/span>s<span class='match'><\/span>:<span class='match'><\/span> <span class='match'>zzz<\/span><span class='match'><\/span>e<span class='match'><\/span>r<span class='match'><\/span>o<span class='match'><\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-d83d0badb94cff9e8303" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d83d0badb94cff9e8303">{"x":{"html":"<ul>\n  <li>Between 2 and 3 digits: <span class='match'>234<\/span>5<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-7176bf0bf9ed8ed2d7ec" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7176bf0bf9ed8ed2d7ec">{"x":{"html":"<ul>\n  <li>5 <span class='match'>conti<\/span><span class='match'>guous<\/span> <span class='match'>lette<\/span>rs<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-1e3519e28b64435fe140" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1e3519e28b64435fe140">{"x":{"html":"<ul>\n  <li><span class='match'><\/span>Z<span class='match'><\/span>e<span class='match'><\/span>r<span class='match'><\/span>o<span class='match'><\/span> <span class='match'><\/span>o<span class='match'><\/span>r<span class='match'><\/span> <span class='match'><\/span>o<span class='match'><\/span>n<span class='match'><\/span>e<span class='match'><\/span> <span class='match'>b<\/span><span class='match'><\/span> <span class='match'><\/span>c<span class='match'><\/span>h<span class='match'><\/span>a<span class='match'><\/span>r<span class='match'><\/span>a<span class='match'><\/span>c<span class='match'><\/span>t<span class='match'><\/span>e<span class='match'><\/span>r<span class='match'><\/span>s<span class='match'><\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+]
+
+---
+
+# Pattern Matching
+
+Use `[]` to select "classes" of characters:
+
+.pull-left.font10[
+
+
+```r
+"[abc]+"    # One or more of 'a', 'b', or 'c'
+"[a-z]"     # Any lowercase letter
+"[^a]"      # Any character BUT 'a'
+"[A-Z0-9+]" # All caps, numbers, and '+'
+```
+
+]
+
+.pull-right.font10[
+
+<div id="htmlwidget-102052724c37331ddf48" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-102052724c37331ddf48">{"x":{"html":"<ul>\n  <li>One or more of '<span class='match'>a<\/span>', '<span class='match'>b<\/span>', or '<span class='match'>c<\/span>': <span class='match'>abc<\/span>d<span class='match'>ab<\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-538635e1f82d0d499779" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-538635e1f82d0d499779">{"x":{"html":"<ul>\n  <li>A<span class='match'>n<\/span><span class='match'>y<\/span> <span class='match'>l<\/span><span class='match'>o<\/span><span class='match'>w<\/span><span class='match'>e<\/span><span class='match'>r<\/span><span class='match'>c<\/span><span class='match'>a<\/span><span class='match'>s<\/span><span class='match'>e<\/span> <span class='match'>l<\/span><span class='match'>e<\/span><span class='match'>t<\/span><span class='match'>t<\/span><span class='match'>e<\/span><span class='match'>r<\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-64dcbc3e7a13733d5c3b" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-64dcbc3e7a13733d5c3b">{"x":{"html":"<ul>\n  <li><span class='match'>A<\/span><span class='match'>n<\/span><span class='match'>y<\/span><span class='match'> <\/span><span class='match'>c<\/span><span class='match'>h<\/span>a<span class='match'>r<\/span>a<span class='match'>c<\/span><span class='match'>t<\/span><span class='match'>e<\/span><span class='match'>r<\/span><span class='match'> <\/span><span class='match'>B<\/span><span class='match'>U<\/span><span class='match'>T<\/span><span class='match'> <\/span><span class='match'>'<\/span>a<span class='match'>'<\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-aaf674e37422535fb37b" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-aaf674e37422535fb37b">{"x":{"html":"<ul>\n  <li><span class='match'>A<\/span>ll caps, numbers, and '<span class='match'>+<\/span>'<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+]
+
+---
+
+# Pattern Matching
+
+Regular expressions work by starting at the beginning of the test string and marching along to the end, one character at a time. Thus, it's very possible to have multiple matches, when you really only cared about the start or end of a string. To address this, there are two **anchor** characters `^` (start) and `$` (end):
+
+.pull-left.font10[
+
+
+```r
+"^Starts"  # Starts with 'Starts'
+"\\.docx$" # Ends in '.docx'
+```
+
+]
+
+.pull-right.font10[
+
+<div id="htmlwidget-a8967d6590858a357e6e" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a8967d6590858a357e6e">{"x":{"html":"<ul>\n  <li><span class='match'>Starts<\/span> with 'Starts'<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-68f976cd6f94b69d6f65" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-68f976cd6f94b69d6f65">{"x":{"html":"<ul>\n  <li>Ends in '.docx': test-file<span class='match'>.docx<\/span><\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+]
+
+---
+
+# Pattern Matching
+
+You can also look for **unions** of patterns using the union bar `|`. If you want to have "subpatterns", use **capture groups** with `()`:
+
+.pull-left.font10[
+
+
+```r
+"this|that"        # "this" OR "that"
+"(this|that) word" # "this..." OR "that..."
+```
+
+]
+
+.pull-right.font10[
+
+<div id="htmlwidget-83d1536d7b4f671f368f" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-83d1536d7b4f671f368f">{"x":{"html":"<ul>\n  <li>'<span class='match'>this<\/span>' or '<span class='match'>that<\/span>'<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script><div id="htmlwidget-7b07f36776c7d40d2931" style="width:960px;height:100%;" class="str_view html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7b07f36776c7d40d2931">{"x":{"html":"<ul>\n  <li>Matches '<span class='match'>this word<\/span>' or '<span class='match'>that word<\/span>'<\/li>\n<\/ul>"},"evals":[],"jsHooks":[]}</script>
+
+]
+
+While you _can_ have nested capture groups (e.g. `^(group(_[ab])?))`) in a regex, there is **no** knowledge of structure hierarchy. Capture groups are evaluated by the number of `(` token incidences.
+
+We'll come back to capture groups in a bit when we talk about string _manipulation_...
+
+---
+class: center, middle
+
+[![RStudio strings cheatsheet](../images/rstudio-regex.png)](https://github.com/rstudio/cheatsheets/blob/master/strings.pdf)
+
+---
+class: center, middle
+
+[![regular expressions 101](../images/regex101.png)](https://regex101.com/)
+
+---
+
+.center[
+
+## ⚠️ Regex Caution ⚠️
+
+Regular expressions are very powerful, but they can be abused.
+
+]
+
+**You cannot use regular expressions alone to parse recursive or nested data**. This is a common mistake due to a misunderstanding of how regexes work. They operate **linearly** and (nearly) **memoryless**. For example, if you tried to create a regex that parses HTML in general (like `&lt;html&gt;&lt;body&gt;&lt;p&gt;HI!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;`), it would fail because it doesn't keep track of the tag level (say, with a count of number of open tags).
+
+**Regular expressions are not a panacea.** Very rarely do regexes describe a pattern for an entire string structure. Instead, they are used to define smaller components of a larger structure _because_ they cannot be used with recursive/nested data. The canonical example is "the" regex for identifying email addresses: [RFC822](http://www.ex-parrot.com/~pdw/Mail-RFC822-Address.html). Even this monstrosity does not cover all cases. [See this StackOverflow thread for more information](https://stackoverflow.com/questions/201323/how-to-validate-an-email-address-using-a-regular-expression/201378#201378).
+
+---
+
+# Recap
+
+.pull-left[
+
+How would I match these strings: "AR1234", "BR9204", and "AR0392"? You can assume that "R" is fixed and there are four digits.
+
+]
+
+.pull-right[
+
+1. `A?B?R\\d{,4}`
+1. `[AB]?R\\d{4}`
+1. `[AB]R\\d{4}`
+1. `[AB]R\\d{,4}`
+
+]
+
+---
+
+# Recap
+
+.pull-left[
+
+How would I match these strings: "AR1234", "BR9204", and "AR0392"? You can assume that "R" is fixed and there are four digits.
+
+]
+
+.pull-right[
+
+1. `A?B?R\\d{,4}`
+1. `[AB]?R\\d{4}`
+1. &lt;span class="highlighted"&gt;`[AB]R\\d{4}`&lt;/span&gt;
+1. `[AB]R\\d{,4}`
+
+]
+
+---
+
+# String Manipulation
+
+Regular expressions are the **cornerstone** of string manipulation tools. Frequent operations include:
+
+- **Concatenating**: Combining multiple strings into one
+- **Searching**: Finding strings that match a pattern
+- **Splitting**: Splitting up a string based on some delimiter
+- **Substitution**: Swapping bits of matched text with other text
+
+---
+
+# Concatenation
+
+The most straightforward operation with strings, **concatenation**, does not require regular expressions. It literally is joining two strings together. To do this, we use the `str_c()` function (remeniscent of `c()`):
+
+.pull-left.font10[
+
+
+```r
+str_c("a", "b")
+
+x &lt;- letters[1:6]
+str_c(x, "_", LETTERS[1:6])
+
+paste0(x, "_", LETTERS[1:6]) # Base R equiv
+```
+
+]
+
+.pull-right.font10[
+
+
+```
+## [1] "ab"
+```
+
+```
+## [1] "a_A" "b_B" "c_C" "d_D" "e_E" "f_F"
+```
+
+```
+## [1] "a_A" "b_B" "c_C" "d_D" "e_E" "f_F"
+```
+
+]
+
+`str_c()` can take an arbitrary number of arguments. As shown in the second output, `str_c()` is _vectorized_ over each of its arguments, applying the function to each of the arguments' elements in a coherent manner.
+
+Also note that `"_"` is _not_ an object (technically a **vector**) with 6 elements. `str_c()` uses **recycling** to repeat the underscore 6 times to match the lengths of the other vectors.
+
+Note that argument order matters! `str_c("a", "b")` is not the same as `str_c("b", "a")`.
+
+---
+
+# Interpolation
+
+A kind of concatenation is **interpolation**, where some "template string" is propagated with variables defined in your working environment. In R, this is achieved using the **glue** package -- included with **stringr**. The idea is that you wrap the symbol of your variable in braces `{}` _inside_ of a string. Then you give that template string to `str_glue()` and its relatives:
+
+.pull-left.font10[
+
+
+```r
+given_name &lt;- "Patrick"
+
+str_glue("Hello, {given_name}!")
+```
+
+```
+## Hello, Patrick!
+```
+
+For variables defined in the working environment...
+
+]
+
+.pull-right.font10[
+
+
+```r
+str_glue_data(
+  head(mtcars, 3), 
+  "Miles per gallon: {mpg}"
+)
+```
+
+```
+## Miles per gallon: 21
+## Miles per gallon: 21
+## Miles per gallon: 22.8
+```
+
+... for variables defined in a dataset.
+
+]
+
+`str_glue()` and `str_glue_data()` are _very_ handy tools if you're combining many strings together.
+
+---
+
+# Searching
+
+Often we need to select strings from text that match a pattern. There are several tools at our disposal depending on our task. We'll use the corpus `stringr::words` to examine these.
+
+Let's find all words that have doubled letters. Use `str_subset()` to get the subset directly:
+
+.pull-left.font10[
+
+
+```r
+# grep("(\\w)\\1", stringr::words, value = TRUE) -- base R equivalent
+str_subset(stringr::words, "(\\w)\\1")
+```
+
+`\\1` is a _backreference_. It refers to whatever was captured in the first capture group, `(\\w)`.
+
+]
+
+.pull-right.font10[
+
+
+```
+##  [1] "accept"      "account"     "across"      "add"         "address"    
+##  [6] "affect"      "afford"      "afternoon"   "agree"       "all"        
+## [11] "allow"       "apparent"    "appear"      "apply"       "appoint"    
+## [16] "approach"    "appropriate" "arrange"     "associate"   "assume"     
+## [21] "attend"      "ball"        "between"     "bill"        "blood"      
+## [26] "book"        "bottle"      "bottom"      "brilliant"   "business"   
+## [31] "call"        "carry"       "choose"      "class"       "coffee"     
+## [36] "colleague"   "collect"     "college"     "comment"     "commit"     
+##  [ reached getOption("max.print") -- omitted 117 entries ]
+```
+
+]
+
+That's a lot of matches! We can use `str_count()` to get the fully tally of matches. This counts the number of matches _per element_, so all we care about is if there are more than zero matches:
+
+.font10[
+
+
+```r
+sum(str_count(stringr::words, "(\\w)\\1") &gt; 0)
+```
+
+```
+## [1] 157
+```
+
+]
+
+---
+
+# Searching
+
+However, sometimes we just need a **logical** vector of `TRUE`/`FALSE` results, useful for filtering with `dplyr::filter()`. For this we use `str_detect()`:
+
+
+```r
+# grepl("(\\w)\\1", stringr::words) -- Base R equivalent
+sum(str_detect(stringr::words, "(\\w)\\1")) # Should be 157!
+```
+
+```
+## [1] 157
+```
+
+Other times we need the direct indices for each matching element in a vector. For this, we use `str_which()`:
+
+
+```r
+# grep("(\\w)\\1", stringr::words) -- Base R equivalent
+str_which(stringr::words, "(\\w)\\1")
+```
+
+
+```
+##  [1]   5   6   8  12  13  16  17  19  25  27  28  43  44  45  46  47  48  53  57
+## [20]  58  60  71  90  92  97 103 106 107 112 119 125 130 149 155 164 166 167 168
+## [39] 171 172
+##  [ reached getOption("max.print") -- omitted 117 entries ]
+```
+
+---
+
+# Searching
+
+We can also recover **matching substrings** using `str_extract()`:
+
+
+```r
+str_extract("rabbit", "(\\w)\\1")
+```
+
+```
+## [1] "bb"
+```
+
+If there's no match, `str_extract()` returns `NA`:
+
+
+```r
+str_extract("rabid", "(\\w)\\1")
+```
+
+```
+## [1] NA
+```
+
+---
+
+# Splitting
+
+Very often, text is joined together with a delimiter. Think of this sentence: its words are separated by whitespace and a colon! To split text into constituent elements, we use `str_split()`:
+
+.font10[
+
+
+```r
+sentence &lt;- "This is a sentence that I'd like to get the words from"
+
+str_split(sentence, "\\s+") # Recall that \\s means all whitespace!
+```
+
+]
+
+--
+
+.font10[
+
+
+```
+## [[1]]
+##  [1] "This"     "is"       "a"        "sentence" "that"     "I'd"     
+##  [7] "like"     "to"       "get"      "the"      "words"    "from"
+```
+
+]
+
+Huh. Strange output. What's that `[[1]]` mean? Let's try a longer input character vector:
+
+.font10[
+
+
+```r
+sentences &lt;- c(
+  "This is one sentence",
+  "This is another"
+)
+
+str_split(sentences, "\\s+")
+```
+
+]
+
+--
+
+.font10[
+
+
+```
+## [[1]]
+## [1] "This"     "is"       "one"      "sentence"
+## 
+## [[2]]
+## [1] "This"    "is"      "another"
+```
+
+]
+
+---
+
+# Splitting
+
+The `str_split()` operation returns a **list**:
+
+
+```r
+str(str_split(sentences, "\\s+"))
+```
+
+```
+## List of 2
+##  $ : chr [1:4] "This" "is" "one" "sentence"
+##  $ : chr [1:3] "This" "is" "another"
+```
+
+**List**s are generalized "container" objects that can contain _heterogeneous_ data, unlike **vectors** which are _homogeneous_.
+
+--
+
+Why does `str_split()` do this? All of the data is of the same type, right?
+
+--
+
+Technically, no. Vectors are characterized by having each of its elements being the same type **and** length 1. Consider how mathematical vector components can be described by `\(N \times 1\)` matrices. Since the splitting operation cannot guarantee the output length for each element, `str_split()` boxes the elements into a list (sometimes referred to as a "ragged list").
+
+---
+
+# Splitting
+
+So how do we access the results? As the `[[1]]` suggests, we use the `[[` operator:
+
+
+```r
+results &lt;- str_split(sentences, "\\s+")
+
+results[[1]]
+```
+
+```
+## [1] "This"     "is"       "one"      "sentence"
+```
+
+While I have used `[` in the past with vectors (e.g. `letters[1:6]`), we need to be more careful with lists. `[` is technically known as the _slice operator_. Slicing is well-defined for vectors, but lists are a little funky. They are the fundamental building block of most custom R objects, and for that reason R allows `[` to be **overriden** for different R objects. Thus, `[` is not always well-defined, so it's better to use `[[` when you want to access a specific element.
+
+When we discuss `for` loops in a bit, it will become _much_ easier to work with these objects.
+
+---
+
+# Substitution
+
+Finally, sometimes it's useful to replace, or even remove, text based on some matching pattern. This is conducted with `str_replace(x, pattern, replacement)`. I'll demonstrate with a piece of real data.
+
+In one of our datasets, we have column names that looked like "G102041", which are very difficult to understand in this structure. For intermediate data cleaning, I renamed these columns to make them easier to understand:
+
+
+```r
+str_replace(
+  "G102041", 
+  "^G(\\d)(\\d{2})(\\d{2})(\\d)",
+  "game_\\2_session_\\4_day_\\1_week_\\3"
+)
+```
+
+```
+## [1] "game_02_session_1_day_1_week_04"
+```
+
+Since the `replacement` argument allows backreferences with `["\\1", "\\2", ..., "\\n"]`, we can move matching text around with ease -- taking full advantage of capture groups!
+
+---
+
+# Recap
+
+.pull-left[
+
+CSV (comma-separated value) documents are a type of tabular dataset where each field is separated by a comma ','. Each row is on its own text line. Sometimes, fields have text that contain their own commas. When this happens, the field is usually quoted with double-quotes '"'. Given this knowledge, is it simple enough to get each field per row using `str_split(row, "\\,")`?
+
+]
+
+.pull-right.middle[
+
+1. **Yes**, the quotes contain the comma, making the split safe.
+1. **No**, this forms a kind of hierarchical structure which cannot be handled with regexes alone.
+
+]
+
+---
+
+# Recap
+
+.pull-left[
+
+CSV (comma-separated value) documents are a type of tabular dataset where each field is separated by a comma ','. Each row is on its own text line. Sometimes, fields have text that contain their own commas. When this happens, the field is usually quoted with double-quotes '"'. Given this knowledge, is it simple enough to get each field per row using `str_split(row, "\\,")`?
+
+]
+
+.pull-right.middle[
+
+1. **Yes**, the quotes contain the comma, making the split safe.
+1. &lt;span class="highlighted"&gt;**No**, this forms a kind of hierarchical structure which cannot be handled with regexes alone.&lt;/span&gt;
+
+]
+
+---
+class: middle, center, inverse
+
+# Functions and For Loops
+## ♻️ 🔁
+
+---
+
+# Functions
+
+It's now time to learn _how_ to write an R function. As mentioned in session 1, functions are atomic building blocks of reusable code. Moreover, R is first and foremost a *functional* language. John M. Chambers, the author of the S language (R's direct ancestor) puts it this way:
+
+&gt; Everything that exists is an object. Everything that happens is a function call.
+&gt; -- _John M. Chambers, [arXiv:1409.3531v1](https://arxiv.org/abs/1409.3531v1)_
+
+Even though it's common to see very long analysis scripts with no user-defined functions, this was **not** the intention of the R authors.
+
+---
+
+# Functions
+
+What does a function consist of? 
+
+Three things: a name, arguments, and a body:
+
+
+
+&lt;code class ='r hljs remark-code'&gt;&lt;span style="background-color:pink"&gt;say_hi&lt;/span&gt; &lt;- function&lt;span style="background-color:yellow"&gt;(x)&lt;/span&gt; {&lt;br&gt;&amp;nbsp;&amp;nbsp;&lt;span style="background-color:AliceBlue"&gt;stringr::str_glue("Hi, {x}!")&lt;/span&gt;&lt;br&gt;}&lt;/code&gt;
+
+Call this function with `say_hi()`:
+
+
+```r
+say_hi("Charles")
+```
+
+```
+## Hi, Charles!
+```
+
+---
+
+# Functions
+
+Function arguments **do not modify** already existing variables in "calling environments":
+
+.pull-left[
+
+
+```r
+x &lt;- "Bob"
+
+say_hi_again &lt;- function(x) {
+  x &lt;- stringr::str_c(x, " Jones")
+  stringr::str_glue("Hi, {x}!")
+}
+
+say_hi_again("Bob")
+
+print(x)
+```
+
+]
+
+.pull-right[
+
+
+```
+## Hi, Bob Jones!
+```
+
+```
+## [1] "Bob"
+```
+
+]
+
+This is a key feature of function creation, known as _lexical scoping_. Strictly speaking, the bodies of functions are evaluated in _different_ environments than the calling environment.
+
+---
+
+# Functions
+
+_When_ do you write a function? The common mantra is that when you have written the same **chunk** of code over and over again, it's an indication that you should rewrite it in a function.
+
+Let's take the mode. Strangely enough, R does not define a built-in function for taking the mode. Writing that code every time we wanted to take the mode would be cumbersome, so let's write a function.
+
+--
+
+The first thing to do when writing a function is to consider its inputs and outputs. For us, we want to take a vector -- any vector -- and return the mode of the vector elements. Let's start there:
+
+
+```r
+vec_mode &lt;- function(x) {
+  x
+}
+```
+
+Style note: function bodies should be indented once. A common R style is to set an indent at two spaces. The opening brace should be after the `function()` call **with a space between the closing paren and the open brace**. The closing brace should be on its own line, with no indent.
+
+---
+
+# Functions
+
+
+```r
+vec_mode &lt;- function(x) {
+  x
+}
+```
+
+Decent start. What's important to note is that the **last line of functions is assumed to be the value of the function**. Since `x` is the last line, `x` will be returned to the calling environment:
+
+
+```r
+vec_mode(1:5)
+```
+
+```
+## [1] 1 2 3 4 5
+```
+
+Now let's work on finding the mode.
+
+---
+
+# Functions
+
+We first want to pick out the **set** of values in the input vector. Getting us the set of values is a stepping point of getting a tabulation of the set. Getting the set is achieved with `unique()`.
+
+
+```r
+vec_mode &lt;- function(x) {
+  ux &lt;- unique(x)
+  
+  ux
+}
+
+vec_mode(c(1, 1, 2))
+```
+
+```
+## [1] 1 2
+```
+
+OK now we've got the set. Now let's compare this with a tabulation.
+
+---
+
+# Functions
+
+To get frequency counts, we need to use `tabulate()` and `match()`. `match()` performs a lookup of a value against a table of values and returns a vector of matching table indices. `tabulate()` counts the number of times each index appears, a perfect candidate for creating our mode function!
+
+
+```r
+vec_mode &lt;- function(x) {
+  ux &lt;- unique(x)
+  tabulated &lt;- tabulate(match(x, ux))
+  
+  tabulated
+}
+
+vec_mode(c(1, 1, 2))
+```
+
+```
+## [1] 2 1
+```
+
+Looks like we got the right counts! Since this is a comparison against the _set_ (which is `{1, 2}`) it looks like R is telling us that `1` has 2 matches while `2` has 1.
+
+---
+
+# Functions
+
+Finally, let's use `which.max()` to get the element with the largest count:
+
+
+```r
+vec_mode &lt;- function(x) {
+  ux &lt;- unique(x)
+  tabulated &lt;- tabulate(match(x, ux))
+  
+  ux[which.max(tabulated)]
+}
+
+vec_mode(c(1, 1, 2))
+```
+
+```
+## [1] 1
+```
+
+.center[
+
+#### 🎉
+
+]
+
+We did it! Of course, writing a function from scratch like this isn't _ever_ as straightforward. Usually you already have some code that you need to restructure somehow, or you're scouring StackOverflow to find a function/approach that'll help you solve your problem. **This is absolutely, positively, 100% normal**. I do this **every day**.
+
+---
+
+# Functions
+
+Let's give `vec_mode()` some input data, shall we? Let's say we do 5 draws of `stringr::words` to generate random "sentences" of 10 words. To increase the chance of repeats, let's work with a subset of the corpus.
+
+
+```r
+set.seed(2003)
+words_subset &lt;- sample(stringr::words, 50)
+
+sentences &lt;- c(
+  paste0(sample(words_subset, 10, replace = TRUE), collapse = " "),
+  paste0(sample(words_subset, 10, replace = TRUE), collapse = " "),
+  paste0(sample(words_subset, 10, replace = TRUE), collapse = " "),
+  paste0(sample(words_subset, 10, replace = TRUE), collapse = " "),
+  paste0(sample(words_subset, 10, replace = TRUE), collapse = " ")
+)
+```
+
+Well... that was hideous to type. If only there were a better way to do repeated tasks like this...
+
+---
+
+# Iteration
+
+Ahh yes, a loop! We're repeating this sentence creation task five times, so let's create an empty character vector with 5 slots, and then for each slot create the "sentence"!
+
+
+```r
+set.seed(2003)
+sentences &lt;- character(5)
+
+for (i in seq_along(sentences)) {
+  sentences[[i]] &lt;- paste0(sample(words_subset, 10, replace = TRUE), collapse = " ")
+}
+```
+
+... what's going on?
+
+---
+
+# Iteration
+
+`for` loops have a basic structure:
+
+
+```r
+for (element in collection) {
+  # ... Do something
+}
+```
+
+The pattern of "preallocating" a container that you'll modify:
+
+
+```r
+container &lt;- abstract_container_with_size(5)
+
+for (index in seq_along(container)) {
+  container[[index]] &lt;- some_action()
+}
+```
+
+is something you _should_ do. Previously, one of the major complaints of R is that its `for` loops were slow. That has been addressed somewhat, but this design pattern _completely_ removes the problem that was causing the slowness.
+
+---
+
+# Iteration
+
+So what did the iteration code do?
+
+
+```r
+sentences
+```
+
+```
+## [1] "pressure south experience word bill answer might might chance relation"    
+## [2] "blow relation purpose south warm real bill strategy service flat"          
+## [3] "answer guess especial flat think real bill might quiet eight"              
+## [4] "new step sir okay warm box word word assume might"                         
+## [5] "purpose okay function normal america chairman brilliant live pressure pick"
+```
+
+Nice! Now, let's split up these sentences, and with our new mastery of `for` loops find the mode of each sentence.
+
+---
+
+# Iteration
+
+Recall that `str_split()` creates a `list`, so when we iterate over the output list, we should use `[[`.
+
+
+```r
+split_list &lt;- str_split(sentences, "\\s+")
+mode_chr &lt;- character(length(split_list))
+
+for (i in seq_along(mode_chr)) {
+  mode_chr[[i]] &lt;- vec_mode(split_list[[i]])
+}
+
+mode_chr
+```
+
+```
+## [1] "might"   "blow"    "answer"  "word"    "purpose"
+```
+
+And with that, we have reduced code that may have taken tens of lines down to just 6. This makes it easier for you to understand _and_ debug. The fewer times you write the same bit of code, the less likely you'll introduce bugs!
+
+In the next and last session of 2020, we'll discuss functional programming in more depth, including tools that allow you to remove some of this boilerplate code and manage complex projects better.
+
+---
+
+# Recap
+
+.pull-left[
+
+Suppose you had a function defined thus:
+
+
+```r
+map &lt;- function(x, f) {
+  out &lt;- vector("list", length(x))
+  
+  for (i in seq_along(x)) {
+    out[[i]] &lt;- f(x[[i]])
+  }
+  
+  out
+}
+```
+
+What are the input types? What is the output type?
+
+]
+
+.pull-right[
+
+1. The inputs are a collection and a function, respectively, and the output is a vector.
+1. The inputs are a collection and a function, respectively, and the output is a list.
+1. The inputs are a function and a collection, respectively, and the output is a vector.
+1. It's not possible to determine the types from this snippet.
+
+]
+
+---
+
+# Recap
+
+.pull-left[
+
+Suppose you had a function defined thus:
+
+
+```r
+map &lt;- function(x, f) {
+  out &lt;- vector("list", length(x))
+  
+  for (i in seq_along(x)) {
+    out[[i]] &lt;- f(x[[i]])
+  }
+  
+  out
+}
+```
+
+What are the input types? What is the output type?
+
+]
+
+.pull-right[
+
+1. The inputs are a collection and a function, respectively, and the output is a vector.
+1. &lt;span class="highlighted"&gt;The inputs are a collection and a function, respectively, and the output is a list.&lt;/span&gt;
+1. The inputs are a function and a collection, respectively, and the output is a vector.
+1. It's not possible to determine the types from this snippet.
+
+]
+
+---
+
+# Exercise
+
+There is a problem with the definition of `vec_mode()`: it cannot handle ties well.
+
+
+```r
+vec_mode(c(1, 2, 1, 2))
+```
+
+```
+## [1] 1
+```
+
+If you only care about the _first_ match, then it's acceptable. However, if you care about _all_ elements that are the most frequent, then we'll need to modify the code a bit.
+
+**Using dplyr and whatever else you know**, come up with another implementation of `vec_mode()` that reports these kinds of ties.
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"highlightLines": true,
+"highlightStyle": "solarized-light",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
