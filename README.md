@@ -31,6 +31,11 @@ sheets are designed so that you can *visually* understand what the
 functions are doing, which builds a stronger intuition than just reading
 the function documentation.
 
+For working with regular expressions, I highly recommend
+[regex101](https://regex101.com). Do note that you *don’t* need to
+escape your backslashes on this platform, but you *do* need to do so
+with R!
+
 Workshop Recordings
 ===================
 
@@ -41,6 +46,8 @@ SSO” button)
     Data](https://nyu.zoom.us/rec/share/VLku7fo5upo3bVs8xdS8K92Q2UPwzrfzCHUxVGPCJh6XZtQqLGlElp2H4aUvEQr3.NghErP0lw2NxupVV)
 2.  [Session 2: Finding Relationships in Your
     Data](https://nyu.zoom.us/rec/share/zSF42XLuzubrBt9fwP2sMPriZvSAp9uq4hU5Qdc1CZI6TjZ6Vu7Cle-Id1Pny54r.cO3UymskhDJVXyWr)
+3.  [Session 3: Making R Work for
+    You](https://nyu.zoom.us/rec/share/55nw_SkaeuhaCXAtZSNbCemnwi9trTvgKLiSKNjaoEew8Qb7mb3UTwKE6eT7rRyg.sg0ApiMqrMhP7B_D)
 
 Setup
 =====
