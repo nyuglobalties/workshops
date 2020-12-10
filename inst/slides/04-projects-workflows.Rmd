@@ -1,0 +1,223 @@
+---
+title: "Session 4"
+subtitle: "Workflows in R: Recommended practices"
+institute: "Global TIES for Children"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    nature:
+      countIncrementalSlides: false
+      highlightLines: true
+      highlightStyle: solarized-light
+      navigation:
+        scroll: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(xaringanthemer)
+style_mono_accent(
+  text_font_google = google_font("Montserrat", "300", "300i"),
+  code_font_google = google_font("Fira Mono")
+)
+library(magrittr)
+library(flair)
+```
+
+<style>
+:root {
+  --font12: 12pt;
+  --font10: 10pt;
+  --font2: 2pt;
+  --nyu-yellow: #ecaa00;
+  --nyu-red: #c50f3c;
+  --nyu-violet: #57068c;
+}
+
+.font12 > table {
+  font-size: var(--font12);
+}
+
+.font12 > p {
+  font-size: var(--font12);
+}
+
+.font12 > pre .remark-code-line {
+  font-size: var(--font12);
+}
+
+.font10 > table {
+  font-size: var(--font10);
+}
+
+.font10 > p {
+  font-size: var(--font10);
+}
+
+.font10 > pre .remark-code-line {
+  font-size: var(--font10);
+}
+
+.font10 > pre {
+  font-size: var(--font10);
+}
+
+.font2 > pre {
+  font-size: var(--font2);
+}
+
+.font10 .str_view {
+  font-size: var(--font10);
+}
+
+.font10.rendered > pre {
+  font-size: var(--font10);
+  font-family: var(--code-font-family);
+  background-color: #fdf6e3;
+  color: #657b83;
+  padding: 5px;
+}
+
+.yellow {
+  color: var(--nyu-yellow);
+}
+
+.red {
+  color: var(--nyu-red);
+}
+
+.violet {
+  color: var(--nyu-violet);
+}
+
+.highlighted {
+  background-color: var(--code-highlight-color);
+}
+
+.highlighted-block {
+  font-family: var(--code-font-family), Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+}
+
+</style>
+
+# Last Time
+
+We talked about:
+
+- Pattern matching
+- String manipulation
+- Function writing
+- Iteration
+
+---
+
+# Agenda
+
+Most of the workshop will be more about project structure, however...
+
+By the end of this workshop, you should be able to understand this block of code:
+
+.font10[
+
+```{r, eval=FALSE}
+library(drake)
+
+drake_plan(
+  raw_data = readxl::read_excel(file_in("raw_data.xlsx")),
+  data = raw_data %>%
+    mutate(Ozone = replace_na(Ozone, mean(Ozone, na.rm = TRUE))),
+  hist = create_plot(data),
+  fit = lm(Ozone ~ Wind + Temp, data),
+  report = rmarkdown::render(
+    knitr_in("report.Rmd"),
+    output_file = file_out("report.html"),
+    quiet = TRUE
+  )
+)
+```
+
+]
+
+---
+
+# Agenda
+
+We'll be covering
+
+- R-script based project structures
+- R "package" project structure
+- Controlling code complexity
+- **drake**
+- Functional programming
+
+I'll have the **tidyverse** meta-package attached throughout the presentation.
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+---
+class: inverse, middle, center
+
+# Project Structures
+
+## 🗄 🗄 🗄 
+
+---
+
+# Project Structures in R
+
+There are several styles of R project out there, and it can be daunting to choose the "best" one. Like most things in life, **there is no "best" project style**. Each has their pros and cons.
+
+These are the project "styles" we'll cover today:
+
+1. R-script based project
+1. R Markdown based project
+1. R package project
+1. **drake** project
+
+The order of these _roughly_ translates to the size of the project, from the smallest scale to largest.
+
+---
+
+# R-script Projects
+
+The simplest structure is the R script. For very, _very_ small projects, it's sufficient to use a single R script:
+
+.pull-left.font10[
+
+<pre>
+project/
+  data/
+    .. All data are stored here ..
+  assets/
+    .. All derived assets (reports and whatnot) ..
+  make.R
+</pre>
+
+]
+
+.pull-right.font10[
+
+```{r, eval=FALSE}
+# make.R
+library(tidyverse)
+
+dat <- read_csv(here::here("data/dataset.csv"))
+
+# ... Do stuff ...
+
+save_results(results, file = here::here("assets/results.dat"))
+```
+
+
+]
+
+All code is stored in the "make.R" file, and its layout roughly follows:
+
+1. Attach required packages with `library()`
+1. Load required datasets
+1. Do stuff to the data to get results
+1. Save results
+
+Each time you change your code or input data, you `source()` the "make.R" script and rerun the code. As you can imagine, this can get unwieldy pretty quickly...
