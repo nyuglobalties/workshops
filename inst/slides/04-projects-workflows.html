@@ -221,6 +221,125 @@ All code is stored in the "make.R" file, and its layout roughly follows:
 1. Save results
 
 Each time you change your code or input data, you `source()` the "make.R" script and rerun the code. As you can imagine, this can get unwieldy pretty quickly...
+
+---
+
+# R-script Projects
+
+The usual solution to having this in a single script is to have multiple topic or stage scripts with one master script. To ensure that the stages are loaded in order, the scripts are prefixed with `00-`, `01-`, `02-`, and so on. Often, these scripts are stored in a separate directory, named "code", "analysis", or other. I prefer to name this folder "R" to follow the R package convention (discussed later).
+
+.pull-left.font10[
+
+&lt;pre&gt;
+project/
+  R/
+    00-libraries.R    # library() calls
+    01-data-loading.R
+    02-wrangling.R
+    ...
+  make.R
+  ...
+  project.Rproj
+&lt;/pre&gt;
+
+Remember: using RStudio projects (the "project.Rproj" file) ensures that calls to `here::here()` refer to the project root `project/`! 
+
+]
+
+.pull-right.font10[
+
+
+```r
+# make.R
+*#!/usr/bin/env Rscript
+
+all_scripts &lt;-
+  list.files(
+    here::here("R"), 
+    full.names = TRUE
+  )
+
+for (script in all_scripts) {
+  source(script)
+}
+```
+
+The number prefixes ensure that the scripts are loaded in order, as `list.files()` returns the file names _alphabetically_.
+
+]
+
+---
+
+# R Markdown Projects
+
+These are similar to pure R-script projects. Rather than having a master "make.R" file that `source()`s all of the R scripts, you use a master R Markdown document. Usually, the end result of a project is some report, paper, or other human-readable asset that you intend to share, so it's only fitting that you do all your writing in an executable R Markdown document while loading in supplemental scripts.
+
+.pull-left.font10[
+
+&lt;pre&gt;
+project/
+  R/
+    00-libraries.R    # library() calls
+    01-data-loading.R
+    02-wrangling.R
+    ...
+  report.Rmd
+  ..
+&lt;/pre&gt;
+
+Right: Blog post by Emily Riederer, a major propronent of "RMarkdown Driven Development"
+
+]
+
+.pull-right.font10[
+
+[![R Markdown Driven Development](../images/riederer_rmdd.png)](https://emilyriederer.netlify.app/post/rmarkdown-driven-development/)
+
+]
+
+---
+
+## R-Script &amp; R Markdown Project Cost/Benefit
+
+The costs/benefits of these project styles are similar, so I'll evaluate them together.
+
+.pull-left[
+
+**Benefit**:
+
+- Good for small-medium scale projects with _few_ outputs
+- Easy to comprehend code flow via prefixed "R" folder
+- Not much infrastructure required
+
+]
+
+.pull-right[
+
+**Cost**:
+
+- Difficult to add new stages
+- Updating code lends itself to rerunning the _entire_ project, wasting time on already-built phases&lt;sup&gt;1&lt;/sup&gt;
+- Maintaining larger-scale scripts without proper testing is _very_ difficult
+
+]
+
+.footnote.font10[
+
+(1): R Markdown -- through **knitr**, the rendering engine -- has the ability to cache chunk outputs, cutting down on build time. However, **knitr**'s cache is very easily invalidated, so it often rebuilds OK chunks anyway.
+
+]
+
+---
+class: center, middle, inverse
+
+# Managing Project Complexity
+## 📦✅
+
+---
+
+# The R Package Structure
+
+R scripts on their own do **not** have an existing infrastructure to 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
