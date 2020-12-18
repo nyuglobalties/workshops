@@ -690,3 +690,42 @@ Note how it's pretty easy to follow the plan to see what's happening. **That is 
 
 ]
 
+---
+class: center, middle
+
+```{r, out.width=500, echo=FALSE}
+knitr::include_graphics("../images/research-compendium.jpg")
+```
+
+
+.footnote.font10[
+
+_The Turing Way_ project illustration by Scriberia. Zenodo. [http://doi.org/10.5281/zenodo.3332807](http://doi.org/10.5281/zenodo.3332807)
+
+]
+
+---
+
+# Research Compendia
+
+Regardless of scale, the most important function of your project structure is to be **replicable**. You should be able to give your work to someone else with a completely different computer, rerun your project, and get identical results to what you got. 
+
+How do you achieve this? Usually, by answering these questions:
+
+1. Does your project recreate the execution environment (packages, environmental variables, external software)?
+1. Does your project have clear instructions to "rerun" it?
+1. Does your project have a clear history, documenting the entire process of the project?
+
+Questions 1 and 2 can be answered directly by project structure. The third requires the use of a proper **version control system**. In the next year, we'll have workshops on `git` and GitHub, and how to use them in a replicable research setting.
+
+---
+class: inverse, center, middle
+
+# Thank you for participating in these workshops!
+
+Michael will take over in the spring to discuss modeling with R.
+
+---
+class: inverse, center, middle
+
+# Questions?
