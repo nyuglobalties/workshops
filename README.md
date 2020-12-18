@@ -1,8 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-Data Team Workshops
-===================
+# Data Team Workshops
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -13,8 +12,7 @@ time we’ll add more and more tutorials to cover a breadth of topics so
 that you can explore the R ecosystem and see how it could benefit your
 workflow.
 
-Tutorial References
--------------------
+## Tutorial References
 
 Much of our R tutorials are based on the exceptionally handy [*R for
 Data Science*](https://r4ds.had.co.nz/) by Grolemund and Wickham. Rather
@@ -36,8 +34,7 @@ For working with regular expressions, I highly recommend
 escape your backslashes on this platform, but you *do* need to do so
 with R!
 
-Workshop Recordings
-===================
+# Workshop Recordings
 
 Access to all recordings requires an NYU login (choose the “Sign in with
 SSO” button)
@@ -48,14 +45,14 @@ SSO” button)
     Data](https://nyu.zoom.us/rec/share/zSF42XLuzubrBt9fwP2sMPriZvSAp9uq4hU5Qdc1CZI6TjZ6Vu7Cle-Id1Pny54r.cO3UymskhDJVXyWr)
 3.  [Session 3: Making R Work for
     You](https://nyu.zoom.us/rec/share/55nw_SkaeuhaCXAtZSNbCemnwi9trTvgKLiSKNjaoEew8Qb7mb3UTwKE6eT7rRyg.sg0ApiMqrMhP7B_D)
+4.  [Session 4: Workflows in R – Recommended
+    practices](https://nyu.zoom.us/rec/share/w1QiqFhfCjfSkPvrUjobg4_1xERFT3_v6FO9RjvggmfNzdjbG-TTpWYZtKfJvRD4.NHpuJlT-HIR-qihP)
 
-Setup
-=====
+# Setup
 
 There are a couple steps to take to get ready:
 
-1 - Get Materials
------------------
+## 1 - Get Materials
 
 All materials for the workshops are contained in this repository. You’ll
 need to download this repo to get started. There are a couple methods
@@ -87,8 +84,7 @@ basics just to get you started:
 
 ![Clone repository box](man/figures/clone-repository.png)
 
-2 - Get Set Up
---------------
+## 2 - Get Set Up
 
 At this point, you should have downloaded this repository. Now we need
 to set up this repository:
@@ -104,10 +100,10 @@ to set up this repository:
 3.  In the “Console” tab that should appear in the left pane, run these
     two commands in order:
 
-<!-- -->
-
-    install.packages("devtools")
-    devtools::install_deps(dependencies = TRUE)
+``` r
+install.packages("devtools")
+devtools::install_deps(dependencies = TRUE)
+```
 
 All of the packages that all materials depend upon should now be
 installed.
