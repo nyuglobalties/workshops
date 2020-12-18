@@ -693,6 +693,11 @@ Note how it's pretty easy to follow the plan to see what's happening. **That is 
 ---
 class: center, middle
 
+[![purrr cheatsheet](../images/purrr-cheatsheet.png)](https://github.com/rstudio/cheatsheets/blob/master/purrr.pdf)
+
+---
+class: center, middle
+
 ```{r, out.width=500, echo=FALSE}
 knitr::include_graphics("../images/research-compendium.jpg")
 ```
