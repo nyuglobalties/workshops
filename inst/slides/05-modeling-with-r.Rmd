@@ -120,7 +120,7 @@ knitr::opts_chunk$set(warning = F, message = F)
 
 --
 
-- This semester's workshop takes an interactive bottom-up approach and provides you with opportunities to start doing things in R.
+- This semester's workshop takes an interactive bottom-up approach (i.e. lots of quizzes and hands-on coding).
 
 --
 
@@ -168,12 +168,16 @@ By the end of this workshop, you should be able to use R to conduct the followin
 - Model selection
 
 Here is a list of packages that you need to run the codes:
-```{r}
-library(tidyverse)
-library(here)
-library(rcoder)
-```
+```{r, eval = F}
+# required packages
+packages <- c("tidyverse", "psych", "here", "skimr", "tldr", "esquisse","broom", "texreg", "remotes")
 
+# check package existence before installing them
+install.packages(setdiff(packages, rownames(installed.packages())))  
+
+# rcoder by Patrick
+remotes::install_github("nyuglobalties/rcoder")
+```
 
 ---
 
@@ -182,7 +186,8 @@ library(rcoder)
 Time to load the data:
 
 ```{r, results = "hide"}
-dat <- read_csv(here("data/sample_intervention_dataset.csv"))
+library(tidyverse)
+dat <- read_csv(here::here("data/sample_intervention_dataset.csv"))
 head(dat)
 ```
 
@@ -199,11 +204,12 @@ DT::datatable(
 Notice that **Intervention** takes the value of 1 and -1, and **Female** takes the value of 0 and 1. This may be less intuitive in analysis, let's change the numeric values to their actual character labels!
 ---
 
-# Quiz!
+## Quiz!
 
 Based on the following codebooks, use the `mutate()` and `if_else()` function to change the values of **Intervention** and **Female** to their corresponding labels. Without changing the values in the original variables, create two new variables called **Affirm** and **Gender**.
 
 ```{r, echo = F}
+library(rcoder)
 coding(code("Treatment", 1), code("Control", -1))
 coding(code("Female", 1), code("Male", 0))
 ```
@@ -236,6 +242,8 @@ median(dat$Final_grade, na.rm = T)
 
 ---
 
+Using the `group_by()` function allows you to calculate things for each gender.
+
 ```{r}
 dat %>% group_by(Gender) %>% 
   summarise(
@@ -245,19 +253,24 @@ dat %>% group_by(Gender) %>%
   )
 ```
 
---
+---
 
 ## Quiz!
 
-Find out the mode of `Final_grade`. (hint: Google it!)
+Find out the mode of `Final_grade` for each gender (`Female` or `Male`) in each intervention group (`Treatment` or `Control`). (hint: Google it!)
 
 --
 ```{r}
+# a function to generate the model
 getmode <- function(v) {
    uniqv <- unique(v)
    uniqv[which.max(tabulate(match(v, uniqv)))]
 }
-getmode(dat$Final_grade)
+
+dat %>% group_by(Gender, Affirm) %>% 
+  summarise(
+    Final_grade_mode = getmode(Final_grade)
+  )
 ```
 
 
@@ -287,8 +300,8 @@ DT::datatable(
 **Could you get descriptive statistics separately for females and males?**
 
 Hints:
-- Do it manually: use `group_by` with pipes (`%>%`).
-- Do it with an existing function: consider `psych::describe.by`.
+- Do it manually: use `group_by()` with pipes (`%>%`).
+- Do it with an existing function: consider `psych::describe.by()`.
 
 ---
 
@@ -388,6 +401,18 @@ barplot(table(dat$Gender), main = "Frequency of gender")
 
 ---
 
+# A much better way of plotting
+
+`esquisse::esquisser()` is a `ggplot2::ggplot` builder that lets you explore your data quickly to extract the information (and the codes!) they hold. 
+
+```{r, eval = F}
+esquisse::esquisser()
+```
+
+### Let's walk through it together!
+
+---
+
 # Chi-squared test
 
 We wish to know whether the assignment to treatment/control is independent from students' gender. We need to first create the contingency table to calculate the chi-squared statistic.
@@ -397,6 +422,7 @@ cont.table <- table(dat$Affirm, dat$Gender)
 chisq.test(cont.table)
 ```
 
+--
 
 ## Quiz
 Could you generate a contingency table without using the dollar sign (`$`) to refer to variables? (Hint: use `select()`)
@@ -644,15 +670,17 @@ with(dat, interaction.plot( Gender, Affirm, Final_score,
 
 # Simple regression
 
+We use the `lm()` function to build linear regression models.
+
 ```{r}
-fit <- lm(Final_score ~ Baseline_math_score + Affirm, dat)
-summary(fit) 
+fit1 <- lm(Final_score ~ Baseline_math_score, dat)
+summary(fit1) 
 ```
 
 ---
 
 ```{r, fig.height=4, dpi = 300}
-ggplot(dat, aes(x = Baseline_math_score, y = Final_score, color = Affirm)) + 
+ggplot(dat, aes(x = Baseline_math_score, y = Final_score)) + 
   geom_point() +
   geom_smooth(method = "lm", fill = NA) +
   theme_bw()
@@ -662,8 +690,8 @@ ggplot(dat, aes(x = Baseline_math_score, y = Final_score, color = Affirm)) +
 
 ```{r}
 # add a quadratic term
-fit <- lm(Final_score ~ Baseline_math_score + I(Baseline_math_score^2) + I(Baseline_math_score^3) , data = dat)
-summary(fit)
+fit2 <- lm(Final_score ~ Baseline_math_score + I(Baseline_math_score^2) + I(Baseline_math_score^3) , data = dat)
+summary(fit2)
 ```
 
 ---
@@ -677,4 +705,134 @@ ggplot(dat, aes(x = Baseline_math_score, y = Final_score)) +
   theme_bw()
 ```
 
+---
 
+# Multiple regression
+
+Building multiple regression is also easy as you can add many predictors into the same equation.
+
+```{r}
+M1 <- lm(Final_score ~ Baseline_math_score, data = dat)
+M2 <- lm(Final_score ~ Baseline_math_score + Affirm, data = dat)
+M3 <- lm(Final_score ~ Baseline_math_score + Affirm*Gender, data = dat)
+M4 <- lm(Final_score ~ Baseline_math_score + Affirm*Gender + Cohort, data = dat)
+```
+
+The `lm` output is useful enough if you just want to read it. However, you would need to run something like `coef(summary(fit))` to extract the coefficients and put them into tabular data. Model comparison is also annoying if you run `summary()` on each model. 
+
+Here are a few existing packages to help you with table generation of model outputs.
+
+---
+
+# `broom::tidy`
+
+`broom::tidy` gives you a nice tabular output of your model. Note it also with all the statistical methods I've talked about so far!
+
+.font10[
+```{r}
+# estimates
+broom::tidy(fit1)
+# model fit
+broom::glance(fit1)
+```
+]
+
+---
+
+# `texreg::htmlreg`
+
+`texreg::htmlreg` is probably the most handy function to generate tables of model comparisons. 
+
+Note `texreg::texreg` gives you LaTex output and `texreg::screenreg` allows you to quickly see the output in R console. You need to specify `results = "asis"` in the chunk header to knit the results.
+
+---
+
+.font10[
+```{r, results = "asis"}
+texreg::htmlreg(
+  list(M1,M2,M3,M4),
+  custom.model.names = c("M1", "M2", "M3", "M4"),
+  caption = "Test models",
+  digits = 3
+)
+```
+]
+
+---
+
+# Regression diagnostics
+
+Assumptions:
+
+- Linearity: The relationship between X and the mean of Y is linear.
+
+- Homoscedasticity: The variance of residual is the same for any value of X.
+
+- Independence: Observations are independent of each other.
+
+- Normality: For any fixed value of X, Y is normally distributed.
+
+---
+
+```{r, fig.height=5, dpi=300}
+par(mfrow = c(2,2))
+plot(M2)
+```
+
+---
+
+# Residuals vs. fitted plot
+
+.pull-left[
+<img src="../images/residual-vs-fitted.png" height="300">
+]
+
+.pull-right[
+The plot of residuals versus predicted values is useful for checking the assumption of **linearity and homoscedasticity**. 
+
+If the model does not meet the linear model assumption, we would expect to see residuals that are very large (big positive value or big negative value). To assess the assumption of linearity we want to ensure that **the residuals are not too far away from 0** (standardized values less than -2 or greater than 2 are deemed problematic). To assess if the homoscedasticity assumption is met we look to make sure that **there is no pattern in the residuals and that they are equally spread around the y = 0 line**.
+]
+
+---
+
+# QQ plot
+
+.pull-left[
+<img src="../images/qq-plot.png" height="300">
+]
+
+.pull-right[
+The **normality** assumption is evaluated based on the residuals and can be evaluated using a QQ-plot (plot 2) by comparing the residuals to "ideal" normal observations. 
+
+**Observations lie well along the 45-degree line in the QQ-plot**, so we may assume that normality holds here.
+]
+
+---
+
+# Scale-location plot
+
+.pull-left[
+<img src="../images/scale-location.png" height="300">
+]
+
+.pull-right[
+The third plot is a scale-location plot (square rooted standardized residual vs. predicted value). This is useful for checking the assumption of **homoscedasticity**. In this particular plot we are checking to see if there is a pattern in the residuals.
+
+The assumption of **a random sample and independent observations** cannot be tested with diagnostic plots. It is an assumption that you can test by examining the study design.
+]
+
+---
+
+# Residual vs. leverage plot
+
+.pull-left[
+<img src="../images/residual-vs-leverage.png" height="300">
+]
+
+.pull-right[
+The fourth plot is of "Cook's distance", which is a measure of **the influence of each observation on the regression coefficients**. 
+
+The Cook's distance statistic is a measure, for each observation in turn, of the extent of change in model estimates when that particular observation is omitted. **Any observation for which the Cook's distance is close to 1 or more**, or **that is substantially larger than other Cook's distances** (highly influential data points), requires investigation.
+]
+
+Outliers may or may not be influential points. **Influential outliers are of the greatest concern**. They should never be disregarded. Careful scrutiny of the original data may reveal an error in data entry that can be corrected. If they remain excluded from the final fitted model, they must be noted in the final report or paper.

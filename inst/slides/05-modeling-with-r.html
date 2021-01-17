@@ -3,7 +3,7 @@
   <head>
     <title>Session 5</title>
     <meta charset="utf-8" />
-    <meta name="date" content="2021-01-16" />
+    <meta name="date" content="2021-01-17" />
     <script src="05-modeling-with-r_files/header-attrs/header-attrs.js"></script>
     <script src="05-modeling-with-r_files/htmlwidgets/htmlwidgets.js"></script>
     <script src="05-modeling-with-r_files/jquery/jquery.min.js"></script>
@@ -23,7 +23,7 @@ class: center, middle, inverse, title-slide
 # Session 5
 ## Have fun modeling with R
 ### Global TIES for Children
-### 2021-01-16
+### 2021-01-17
 
 ---
 
@@ -123,7 +123,7 @@ class: center, middle, inverse, title-slide
 
 --
 
-- This semester's workshop takes an interactive bottom-up approach and provides you with opportunities to start doing things in R.
+- This semester's workshop takes an interactive bottom-up approach (i.e. lots of quizzes and hands-on coding).
 
 --
 
@@ -173,11 +173,15 @@ By the end of this workshop, you should be able to use R to conduct the followin
 Here is a list of packages that you need to run the codes:
 
 ```r
-library(tidyverse)
-library(here)
-library(rcoder)
-```
+# required packages
+packages &lt;- c("tidyverse", "psych", "here", "skimr", "tldr", "esquisse","broom", "texreg", "remotes")
 
+# check package existence before installing them
+install.packages(setdiff(packages, rownames(installed.packages())))  
+
+# rcoder by Patrick
+remotes::install_github("nyuglobalties/rcoder")
+```
 
 ---
 
@@ -187,17 +191,18 @@ Time to load the data:
 
 
 ```r
-dat &lt;- read_csv(here("data/sample_intervention_dataset.csv"))
+library(tidyverse)
+dat &lt;- read_csv(here::here("data/sample_intervention_dataset.csv"))
 head(dat)
 ```
 
-<div id="htmlwidget-360f6d66c7373eabad54" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-360f6d66c7373eabad54">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],[1,2,3,4,5,6],[1,2,3,6,9,11],["A","A","A","A","A","A"],[-1,1,1,-1,-1,-1],[1,0,0,0,0,0],[3.7,2.7,2.3,3.7,4,4],[83.07,70.84,69.23,83.96,88.15,89.73],[0.48,1.13,-0.17,1.79,-0.04,1.79],[2,2,1,1,3,3]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>X1<\/th>\n      <th>Coded_ID<\/th>\n      <th>Cohort<\/th>\n      <th>Intervention<\/th>\n      <th>Female<\/th>\n      <th>Final_grade<\/th>\n      <th>Final_score<\/th>\n      <th>Baseline_math_score<\/th>\n      <th>Baseline_stereotype_endorsement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":3,"scrollX":true,"scrollY":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-80676529461fa8b3fee6" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-80676529461fa8b3fee6">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],[1,2,3,4,5,6],[1,2,3,6,9,11],["A","A","A","A","A","A"],[-1,1,1,-1,-1,-1],[1,0,0,0,0,0],[3.7,2.7,2.3,3.7,4,4],[83.07,70.84,69.23,83.96,88.15,89.73],[0.48,1.13,-0.17,1.79,-0.04,1.79],[2,2,1,1,3,3]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>X1<\/th>\n      <th>Coded_ID<\/th>\n      <th>Cohort<\/th>\n      <th>Intervention<\/th>\n      <th>Female<\/th>\n      <th>Final_grade<\/th>\n      <th>Final_score<\/th>\n      <th>Baseline_math_score<\/th>\n      <th>Baseline_stereotype_endorsement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":3,"scrollX":true,"scrollY":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 Notice that **Intervention** takes the value of 1 and -1, and **Female** takes the value of 0 and 1. This may be less intuitive in analysis, let's change the numeric values to their actual character labels!
 ---
 
-# Quiz!
+## Quiz!
 
 Based on the following codebooks, use the `mutate()` and `if_else()` function to change the values of **Intervention** and **Female** to their corresponding labels. Without changing the values in the original variables, create two new variables called **Affirm** and **Gender**.
 
@@ -286,6 +291,8 @@ median(dat$Final_grade, na.rm = T)
 
 ---
 
+Using the `group_by()` function allows you to calculate things for each gender.
+
 
 ```r
 dat %&gt;% group_by(Gender) %&gt;% 
@@ -304,24 +311,36 @@ dat %&gt;% group_by(Gender) %&gt;%
 ## 2 Male               2.84          0.897                3
 ```
 
---
+---
 
 ## Quiz!
 
-Find out the mode of `Final_grade`. (hint: Google it!)
+Find out the mode of `Final_grade` for each gender (`Female` or `Male`) in each intervention group (`Treatment` or `Control`). (hint: Google it!)
 
 --
 
 ```r
+# a function to generate the model
 getmode &lt;- function(v) {
    uniqv &lt;- unique(v)
    uniqv[which.max(tabulate(match(v, uniqv)))]
 }
-getmode(dat$Final_grade)
+
+dat %&gt;% group_by(Gender, Affirm) %&gt;% 
+  summarise(
+    Final_grade_mode = getmode(Final_grade)
+  )
 ```
 
 ```
-## [1] 3.7
+## # A tibble: 4 x 3
+## # Groups:   Gender [2]
+##   Gender Affirm    Final_grade_mode
+##   &lt;chr&gt;  &lt;chr&gt;                &lt;dbl&gt;
+## 1 Female Control                2.3
+## 2 Female Treatment              1.7
+## 3 Male   Control                3.7
+## 4 Male   Treatment              3.7
 ```
 
 
@@ -336,8 +355,8 @@ df &lt;- psych::describe(dat.s) %&gt;%
   mutate_if(is.numeric, round, 3)
 ```
 
-<div id="htmlwidget-bedee400a9f01a064f5b" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-bedee400a9f01a064f5b">{"x":{"filter":"none","data":[["1","2","3","4"],["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],[1,2,3,4],[100,100,100,100],[2.72,72.838,0.14,2.42],[0.943,12.735,0.918,1.281],[2.7,73.865,0.09,2.5],[2.761,73.868,0.175,2.312],[1.483,13.618,0.934,2.224],[0,38.56,-2.24,1],[4,92.92,1.8,5],[4,54.36,4.04,4],[-0.381,-0.689,-0.338,0.362],[-0.702,0.046,-0.028,-1.002],[0.094,1.273,0.092,0.128]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>varnames<\/th>\n      <th>vars<\/th>\n      <th>n<\/th>\n      <th>mean<\/th>\n      <th>sd<\/th>\n      <th>median<\/th>\n      <th>trimmed<\/th>\n      <th>mad<\/th>\n      <th>min<\/th>\n      <th>max<\/th>\n      <th>range<\/th>\n      <th>skew<\/th>\n      <th>kurtosis<\/th>\n      <th>se<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4788eb0f6542254650ce" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4788eb0f6542254650ce">{"x":{"filter":"none","data":[["1","2","3","4"],["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],[1,2,3,4],[100,100,100,100],[2.72,72.838,0.14,2.42],[0.943,12.735,0.918,1.281],[2.7,73.865,0.09,2.5],[2.761,73.868,0.175,2.312],[1.483,13.618,0.934,2.224],[0,38.56,-2.24,1],[4,92.92,1.8,5],[4,54.36,4.04,4],[-0.381,-0.689,-0.338,0.362],[-0.702,0.046,-0.028,-1.002],[0.094,1.273,0.092,0.128]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>varnames<\/th>\n      <th>vars<\/th>\n      <th>n<\/th>\n      <th>mean<\/th>\n      <th>sd<\/th>\n      <th>median<\/th>\n      <th>trimmed<\/th>\n      <th>mad<\/th>\n      <th>min<\/th>\n      <th>max<\/th>\n      <th>range<\/th>\n      <th>skew<\/th>\n      <th>kurtosis<\/th>\n      <th>se<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -346,8 +365,8 @@ df &lt;- psych::describe(dat.s) %&gt;%
 **Could you get descriptive statistics separately for females and males?**
 
 Hints:
-- Do it manually: use `group_by` with pipes (`%&gt;%`).
-- Do it with an existing function: consider `psych::describe.by`.
+- Do it manually: use `group_by()` with pipes (`%&gt;%`).
+- Do it with an existing function: consider `psych::describe.by()`.
 
 ---
 
@@ -358,8 +377,8 @@ df &lt;- skimr::skim(dat.s) %&gt;%
   mutate_if(is.numeric, round, 3)
 ```
 
-<div id="htmlwidget-cef7659029ca27e5e622" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-cef7659029ca27e5e622">{"x":{"filter":"none","data":[["1","2","3","4"],["numeric","numeric","numeric","numeric"],["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],[0,0,0,0],[1,1,1,1],[2.72,72.838,0.14,2.42],[0.943,12.735,0.918,1.281],[0,38.56,-2.24,1],[2,64.665,-0.41,1],[2.7,73.865,0.09,2.5],[3.7,82.92,0.745,3],[4,92.92,1.8,5],["▁▁▇▅▇","▂▃▆▇▇","▁▂▇▆▅","▇▃▇▃▂"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>skim_type<\/th>\n      <th>skim_variable<\/th>\n      <th>n_missing<\/th>\n      <th>complete_rate<\/th>\n      <th>numeric.mean<\/th>\n      <th>numeric.sd<\/th>\n      <th>numeric.p0<\/th>\n      <th>numeric.p25<\/th>\n      <th>numeric.p50<\/th>\n      <th>numeric.p75<\/th>\n      <th>numeric.p100<\/th>\n      <th>numeric.hist<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-c403df594d6f69bdffa0" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c403df594d6f69bdffa0">{"x":{"filter":"none","data":[["1","2","3","4"],["numeric","numeric","numeric","numeric"],["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],[0,0,0,0],[1,1,1,1],[2.72,72.838,0.14,2.42],[0.943,12.735,0.918,1.281],[0,38.56,-2.24,1],[2,64.665,-0.41,1],[2.7,73.865,0.09,2.5],[3.7,82.92,0.745,3],[4,92.92,1.8,5],["▁▁▇▅▇","▂▃▆▇▇","▁▂▇▆▅","▇▃▇▃▂"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>skim_type<\/th>\n      <th>skim_variable<\/th>\n      <th>n_missing<\/th>\n      <th>complete_rate<\/th>\n      <th>numeric.mean<\/th>\n      <th>numeric.sd<\/th>\n      <th>numeric.p0<\/th>\n      <th>numeric.p25<\/th>\n      <th>numeric.p50<\/th>\n      <th>numeric.p75<\/th>\n      <th>numeric.p100<\/th>\n      <th>numeric.hist<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -458,8 +477,8 @@ df &lt;- gen.ftab(dat.s)
 ```
 ]
 
-<div id="htmlwidget-28d67db042bed74d565f" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-28d67db042bed74d565f">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10"],["n","Affirm = Treatment (%)","Gender = Male (%)","Cohort = B (%)","Baseline_stereotype_endorsement (%)","   1","   2","   3","   4","   5"],["100"," 60 (60.0) "," 66 (66.0) "," 55 (55.0) "," "," 35 (35.0) "," 15 (15.0) "," 30 (30.0) "," 13 (13.0) ","  7 ( 7.0) "]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Variable<\/th>\n      <th>Overall<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollY":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-9046b53b395acafc0f79" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9046b53b395acafc0f79">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10"],["n","Affirm = Treatment (%)","Gender = Male (%)","Cohort = B (%)","Baseline_stereotype_endorsement (%)","   1","   2","   3","   4","   5"],["100"," 60 (60.0) "," 66 (66.0) "," 55 (55.0) "," "," 35 (35.0) "," 15 (15.0) "," 30 (30.0) "," 13 (13.0) ","  7 ( 7.0) "]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Variable<\/th>\n      <th>Overall<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollY":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -475,6 +494,19 @@ barplot(table(dat$Gender), main = "Frequency of gender")
 
 ---
 
+# A much better way of plotting
+
+`esquisse::esquisser()` is a `ggplot2::ggplot` builder that lets you explore your data quickly to extract the information (and the codes!) they hold. 
+
+
+```r
+esquisse::esquisser()
+```
+
+### Let's walk through it together!
+
+---
+
 # Chi-squared test
 
 We wish to know whether the assignment to treatment/control is independent from students' gender. We need to first create the contingency table to calculate the chi-squared statistic.
@@ -487,12 +519,14 @@ chisq.test(cont.table)
 
 ```
 ## 
-## 	Pearson's Chi-squared test with Yates' continuity correction
+## 	Pearson's Chi-squared test with Yates' continuity
+## 	correction
 ## 
 ## data:  cont.table
 ## X-squared = 0.22467, df = 1, p-value = 0.6355
 ```
 
+--
 
 ## Quiz
 Could you generate a contingency table without using the dollar sign (`$`) to refer to variables? (Hint: use `select()`)
@@ -516,7 +550,8 @@ chisq.test(cont.table)
 
 ```
 ## 
-## 	Pearson's Chi-squared test with Yates' continuity correction
+## 	Pearson's Chi-squared test with Yates' continuity
+## 	correction
 ## 
 ## data:  cont.table
 ## X-squared = 0.22467, df = 1, p-value = 0.6355
@@ -638,8 +673,8 @@ The output looks like this:
 corstarsl(dat.s)
 ```
 
-<div id="htmlwidget-b9b913b1e009167a7635" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-b9b913b1e009167a7635">{"x":{"filter":"none","data":[["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],["--"," 0.965***"," 0.424***"," 0.055"],["","--"," 0.414***"," 0.024"],["","","--"," 0.118"],["","","","--"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Final_grade<\/th>\n      <th>Final_score<\/th>\n      <th>Baseline_math_score<\/th>\n      <th>Baseline_stereotype_endorsement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-97f15d23182965483cd1" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-97f15d23182965483cd1">{"x":{"filter":"none","data":[["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],["--"," 0.965***"," 0.424***"," 0.055"],["","--"," 0.414***"," 0.024"],["","","--"," 0.118"],["","","","--"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Final_grade<\/th>\n      <th>Final_score<\/th>\n      <th>Baseline_math_score<\/th>\n      <th>Baseline_stereotype_endorsement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 **(\*\*\* 0.001, \*\* 0.01, \* 0.05)**
 
@@ -801,7 +836,7 @@ par(mfrow = c(1,1), mar = c(5,8,4,2), las = 1)
 plot(TukeyHSD(fit))
 ```
 
-![](05-modeling-with-r_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -850,59 +885,60 @@ with(dat, interaction.plot( Gender, Affirm, Final_score,
                            pch = c(16,18)))
 ```
 
-![](05-modeling-with-r_files/figure-html/unnamed-chunk-37-1.png)&lt;!-- --&gt;
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-38-1.png)&lt;!-- --&gt;
 
 ---
 
 # Simple regression
 
+We use the `lm()` function to build linear regression models.
+
 
 ```r
-fit &lt;- lm(Final_score ~ Baseline_math_score + Affirm, dat)
-summary(fit) 
+fit1 &lt;- lm(Final_score ~ Baseline_math_score, dat)
+summary(fit1) 
 ```
 
 ```
 ## 
 ## Call:
-## lm(formula = Final_score ~ Baseline_math_score + Affirm, data = dat)
+## lm(formula = Final_score ~ Baseline_math_score, data = dat)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -39.453  -6.092   1.923   8.068  21.948 
+## -38.221  -5.684   1.588   8.390  23.346 
 ## 
 ## Coefficients:
 ##                     Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)           70.119      1.840  38.113  &lt; 2e-16 ***
-## Baseline_math_score    5.692      1.271   4.480 2.04e-05 ***
-## AffirmTreatment        3.203      2.369   1.352     0.18    
+## (Intercept)           72.034      1.179  61.107  &lt; 2e-16 ***
+## Baseline_math_score    5.741      1.275   4.501 1.86e-05 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Residual standard error: 11.6 on 97 degrees of freedom
-## Multiple R-squared:  0.1866,	Adjusted R-squared:  0.1699 
-## F-statistic: 11.13 on 2 and 97 DF,  p-value: 4.452e-05
+## Residual standard error: 11.65 on 98 degrees of freedom
+## Multiple R-squared:  0.1713,	Adjusted R-squared:  0.1629 
+## F-statistic: 20.26 on 1 and 98 DF,  p-value: 1.863e-05
 ```
 
 ---
 
 
 ```r
-ggplot(dat, aes(x = Baseline_math_score, y = Final_score, color = Affirm)) + 
+ggplot(dat, aes(x = Baseline_math_score, y = Final_score)) + 
   geom_point() +
   geom_smooth(method = "lm", fill = NA) +
   theme_bw()
 ```
 
-![](05-modeling-with-r_files/figure-html/unnamed-chunk-39-1.png)&lt;!-- --&gt;
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-40-1.png)&lt;!-- --&gt;
 
 ---
 
 
 ```r
 # add a quadratic term
-fit &lt;- lm(Final_score ~ Baseline_math_score + I(Baseline_math_score^2) + I(Baseline_math_score^3) , data = dat)
-summary(fit)
+fit2 &lt;- lm(Final_score ~ Baseline_math_score + I(Baseline_math_score^2) + I(Baseline_math_score^3) , data = dat)
+summary(fit2)
 ```
 
 ```
@@ -941,9 +977,290 @@ ggplot(dat, aes(x = Baseline_math_score, y = Final_score)) +
   theme_bw()
 ```
 
-![](05-modeling-with-r_files/figure-html/unnamed-chunk-41-1.png)&lt;!-- --&gt;
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-42-1.png)&lt;!-- --&gt;
+
+---
+
+# Multiple regression
+
+Building multiple regression is also easy as you can add many predictors into the same equation.
 
 
+```r
+M1 &lt;- lm(Final_score ~ Baseline_math_score, data = dat)
+M2 &lt;- lm(Final_score ~ Baseline_math_score + Affirm, data = dat)
+M3 &lt;- lm(Final_score ~ Baseline_math_score + Affirm*Gender, data = dat)
+M4 &lt;- lm(Final_score ~ Baseline_math_score + Affirm*Gender + Cohort, data = dat)
+```
+
+The `lm` output is useful enough if you just want to read it. However, you would need to run something like `coef(summary(fit))` to extract the coefficients and put them into tabular data. Model comparison is also annoying if you run `summary()` on each model. 
+
+Here are a few existing packages to help you with table generation of model outputs.
+
+---
+
+# `broom::tidy`
+
+`broom::tidy` gives you a nice tabular output of your model. Note it also with all the statistical methods I've talked about so far!
+
+.font10[
+
+```r
+# estimates
+broom::tidy(fit1)
+```
+
+```
+## # A tibble: 2 x 5
+##   term                estimate std.error statistic  p.value
+##   &lt;chr&gt;                  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)            72.0       1.18     61.1  7.81e-80
+## 2 Baseline_math_score     5.74      1.28      4.50 1.86e- 5
+```
+
+```r
+# model fit
+broom::glance(fit1)
+```
+
+```
+## # A tibble: 1 x 12
+##   r.squared adj.r.squared sigma statistic p.value    df logLik
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+## 1     0.171         0.163  11.7      20.3 1.86e-5     1  -386.
+## # … with 5 more variables: AIC &lt;dbl&gt;, BIC &lt;dbl&gt;, deviance &lt;dbl&gt;,
+## #   df.residual &lt;int&gt;, nobs &lt;int&gt;
+```
+]
+
+---
+
+# `texreg::htmlreg`
+
+`texreg::htmlreg` is probably the most handy function to generate tables of model comparisons. 
+
+Note `texreg::texreg` gives you LaTex output and `texreg::screenreg` allows you to quickly see the output in R console. You need to specify `results = "asis"` in the chunk header to knit the results.
+
+---
+
+.font10[
+
+```r
+texreg::htmlreg(
+  list(M1,M2,M3,M4),
+  custom.model.names = c("M1", "M2", "M3", "M4"),
+  caption = "Test models",
+  digits = 3
+)
+```
+
+&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
+&lt;caption&gt;Test models&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;M1&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;M2&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;M3&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;M4&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(Intercept)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;72.034&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70.119&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;66.726&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;64.921&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.179)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.840)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(3.363)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(3.618)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Baseline_math_score&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;5.741&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;5.692&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;5.532&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;5.940&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.275)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.271)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.300)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.331)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;AffirmTreatment&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;3.203&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;6.677&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;6.639&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(2.369)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(4.176)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(4.160)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;GenderMale&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;4.872&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;5.113&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(4.039)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(4.027)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;AffirmTreatment:GenderMale&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-4.958&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-5.326&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(5.083)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(5.071)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;CohortB&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;3.184&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(2.409)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.171&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.187&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.199&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.214&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.163&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.170&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.165&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.172&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-bottom: 2px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;100&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;100&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;100&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;100&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;
+&lt;tr&gt;
+&lt;td style="font-size: 0.8em;" colspan="5"&gt;&lt;sup&gt;***&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;**&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tfoot&gt;
+&lt;/table&gt;
+]
+
+---
+
+# Regression diagnostics
+
+Assumptions:
+
+- Linearity: The relationship between X and the mean of Y is linear.
+
+- Homoscedasticity: The variance of residual is the same for any value of X.
+
+- Independence: Observations are independent of each other.
+
+- Normality: For any fixed value of X, Y is normally distributed.
+
+---
+
+
+```r
+par(mfrow = c(2,2))
+plot(M2)
+```
+
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-46-1.png)&lt;!-- --&gt;
+
+---
+
+# Residuals vs. fitted plot
+
+.pull-left[
+&lt;img src="../images/residual-vs-fitted.png" height="300"&gt;
+]
+
+.pull-right[
+The plot of residuals versus predicted values is useful for checking the assumption of **linearity and homoscedasticity**. 
+
+If the model does not meet the linear model assumption, we would expect to see residuals that are very large (big positive value or big negative value). To assess the assumption of linearity we want to ensure that **the residuals are not too far away from 0** (standardized values less than -2 or greater than 2 are deemed problematic). To assess if the homoscedasticity assumption is met we look to make sure that **there is no pattern in the residuals and that they are equally spread around the y = 0 line**.
+]
+
+---
+
+# QQ plot
+
+.pull-left[
+&lt;img src="../images/qq-plot.png" height="300"&gt;
+]
+
+.pull-right[
+The **normality** assumption is evaluated based on the residuals and can be evaluated using a QQ-plot (plot 2) by comparing the residuals to "ideal" normal observations. 
+
+**Observations lie well along the 45-degree line in the QQ-plot**, so we may assume that normality holds here.
+]
+
+---
+
+# Scale-location plot
+
+.pull-left[
+&lt;img src="../images/scale-location.png" height="300"&gt;
+]
+
+.pull-right[
+The third plot is a scale-location plot (square rooted standardized residual vs. predicted value). This is useful for checking the assumption of **homoscedasticity**. In this particular plot we are checking to see if there is a pattern in the residuals.
+
+The assumption of **a random sample and independent observations** cannot be tested with diagnostic plots. It is an assumption that you can test by examining the study design.
+]
+
+---
+
+# Residual vs. leverage plot
+
+.pull-left[
+&lt;img src="../images/residual-vs-leverage.png" height="300"&gt;
+]
+
+.pull-right[
+The fourth plot is of "Cook's distance", which is a measure of **the influence of each observation on the regression coefficients**. 
+
+The Cook's distance statistic is a measure, for each observation in turn, of the extent of change in model estimates when that particular observation is omitted. **Any observation for which the Cook's distance is close to 1 or more**, or **that is substantially larger than other Cook's distances** (highly influential data points), requires investigation.
+]
+
+Outliers may or may not be influential points. **Influential outliers are of the greatest concern**. They should never be disregarded. Careful scrutiny of the original data may reveal an error in data entry that can be corrected. If they remain excluded from the final fitted model, they must be noted in the final report or paper.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
