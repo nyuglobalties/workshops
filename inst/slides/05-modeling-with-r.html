@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Session 5</title>
+    <meta charset="utf-8" />
+    <meta name="date" content="2021-01-17" />
+    <script src="05-modeling-with-r_files/header-attrs/header-attrs.js"></script>
+    <script src="05-modeling-with-r_files/htmlwidgets/htmlwidgets.js"></script>
+    <script src="05-modeling-with-r_files/jquery/jquery.min.js"></script>
+    <link href="05-modeling-with-r_files/datatables-css/datatables-crosstalk.css" rel="stylesheet" />
+    <script src="05-modeling-with-r_files/datatables-binding/datatables.js"></script>
+    <link href="05-modeling-with-r_files/dt-core/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="05-modeling-with-r_files/dt-core/css/jquery.dataTables.extra.css" rel="stylesheet" />
+    <script src="05-modeling-with-r_files/dt-core/js/jquery.dataTables.min.js"></script>
+    <link href="05-modeling-with-r_files/crosstalk/css/crosstalk.css" rel="stylesheet" />
+    <script src="05-modeling-with-r_files/crosstalk/js/crosstalk.min.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Session 5
+## Have fun modeling with R
+### Global TIES for Children
+### 2021-01-17
+
+---
+
+
+
+
+&lt;style&gt;
+:root {
+  --font12: 12pt;
+  --font10: 10pt;
+  --font2: 2pt;
+  --nyu-yellow: #ecaa00;
+  --nyu-red: #c50f3c;
+  --nyu-violet: #57068c;
+}
+
+.font12 &gt; table {
+  font-size: var(--font12);
+}
+
+.font12 &gt; p {
+  font-size: var(--font12);
+}
+
+.font12 &gt; ul {
+  font-size: var(--font12);
+}
+
+.font12 &gt; pre .remark-code-line {
+  font-size: var(--font12);
+}
+
+.font10 &gt; table {
+  font-size: var(--font10);
+}
+
+.font10 &gt; p {
+  font-size: var(--font10);
+}
+
+.font10 &gt; pre .remark-code-line {
+  font-size: var(--font10);
+}
+
+.font10 &gt; pre {
+  font-size: var(--font10);
+}
+
+.font2 &gt; pre {
+  font-size: var(--font2);
+}
+
+.font10 .str_view {
+  font-size: var(--font10);
+}
+
+.font10.rendered &gt; pre {
+  font-size: var(--font10);
+  font-family: var(--code-font-family);
+  background-color: #fdf6e3;
+  color: #657b83;
+  padding: 5px;
+}
+
+.yellow {
+  color: var(--nyu-yellow);
+}
+
+.red {
+  color: var(--nyu-red);
+}
+
+.violet {
+  color: var(--nyu-violet);
+}
+
+.highlighted {
+  background-color: var(--code-highlight-color);
+}
+
+.highlighted-block {
+  font-family: var(--code-font-family), Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+}
+
+.aligncenter {
+    text-align: center;
+}
+
+&lt;/style&gt;
+
+
+# Before we get started...
+
+--
+
+- Last semester's workshop takes a lecture-style top-down approach and provides you with a rich source of functions &amp; commands to build up your own R dictionary.
+
+--
+
+- This semester's workshop takes an interactive bottom-up approach (i.e. lots of quizzes and hands-on coding).
+
+--
+
+- Things that I wish I had been told when I started learning R:
+
+--
+
+  - **Coding is hard and intimidating!!!**
+
+--
+
+  - **You need to figure out early why you need it and what you need it for.**
+
+--
+
+  - **Time investment is huge and the reward is also huge.**
+
+--
+
+  - **99% of the answers to your questions are on Google. Stackoverflow, various R blogs, and R bookdown books are your friends.**
+
+--
+
+  - **Be problem-focused if you are a social scientist trying to learn R. Specify your problem (e.g. finding the mean), and find ways to execute it in R.**
+  
+--
+
+- But don't worry, I'll try to hold your hands through the basics.
+
+---
+.aligncenter[
+&lt;img src="../images/learn-to-code.jpg" height="600"&gt;
+]
+---
+# Agenda
+
+By the end of this workshop, you should be able to use R to conduct the following analysis:
+
+- Descriptive analysis
+- Chi-squared test
+- Correlation
+- T-test
+- ANOVA
+- Simple and multiple regression
+- Model selection
+
+Here is a list of packages that you need to run the codes:
+
+```r
+# required packages
+packages &lt;- c("tidyverse", "psych", "here", "skimr", "tldr", "esquisse","broom", "texreg", "remotes")
+
+# check package existence before installing them
+install.packages(setdiff(packages, rownames(installed.packages())))  
+
+# rcoder by Patrick
+remotes::install_github("nyuglobalties/rcoder")
+```
+
+---
+
+# Let's load our data!
+
+Time to load the data:
+
+
+```r
+library(tidyverse)
+dat &lt;- read_csv(here::here("data/sample_intervention_dataset.csv"))
+head(dat)
+```
+
+<div id="htmlwidget-80676529461fa8b3fee6" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-80676529461fa8b3fee6">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],[1,2,3,4,5,6],[1,2,3,6,9,11],["A","A","A","A","A","A"],[-1,1,1,-1,-1,-1],[1,0,0,0,0,0],[3.7,2.7,2.3,3.7,4,4],[83.07,70.84,69.23,83.96,88.15,89.73],[0.48,1.13,-0.17,1.79,-0.04,1.79],[2,2,1,1,3,3]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>X1<\/th>\n      <th>Coded_ID<\/th>\n      <th>Cohort<\/th>\n      <th>Intervention<\/th>\n      <th>Female<\/th>\n      <th>Final_grade<\/th>\n      <th>Final_score<\/th>\n      <th>Baseline_math_score<\/th>\n      <th>Baseline_stereotype_endorsement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":3,"scrollX":true,"scrollY":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+
+Notice that **Intervention** takes the value of 1 and -1, and **Female** takes the value of 0 and 1. This may be less intuitive in analysis, let's change the numeric values to their actual character labels!
+---
+
+## Quiz!
+
+Based on the following codebooks, use the `mutate()` and `if_else()` function to change the values of **Intervention** and **Female** to their corresponding labels. Without changing the values in the original variables, create two new variables called **Affirm** and **Gender**.
+
+
+```
+## &lt;Coding&gt;
+## # A tibble: 2 x 4
+##   link      label     value description
+##   &lt;chr&gt;     &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;      
+## 1 Treatment Treatment     1 Treatment  
+## 2 Control   Control      -1 Control
+```
+
+```
+## &lt;Coding&gt;
+## # A tibble: 2 x 4
+##   link   label  value description
+##   &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;      
+## 1 Female Female     1 Female     
+## 2 Male   Male       0 Male
+```
+
+---
+
+# Answer
+
+```r
+dat &lt;- dat %&gt;% 
+  mutate(Affirm = if_else(Intervention == 1, "Treatment", "Control"),
+         Gender = if_else(Female == 1, "Female", "Male")
+         )
+```
+
+
+```r
+table(dat$Affirm, dat$Intervention)
+```
+
+```
+##            
+##             -1  1
+##   Control   40  0
+##   Treatment  0 60
+```
+
+```r
+table(dat$Gender, dat$Female)
+```
+
+```
+##         
+##           0  1
+##   Female  0 34
+##   Male   66  0
+```
+
+---
+
+# Descriptive analysis with continuous variables
+
+## 1. Do it manually
+
+```r
+mean(dat$Final_grade, na.rm = T)
+```
+
+```
+## [1] 2.72
+```
+
+```r
+sd(dat$Final_grade, na.rm = T)
+```
+
+```
+## [1] 0.9431304
+```
+
+```r
+median(dat$Final_grade, na.rm = T)
+```
+
+```
+## [1] 2.7
+```
+
+---
+
+Using the `group_by()` function allows you to calculate things for each gender.
+
+
+```r
+dat %&gt;% group_by(Gender) %&gt;% 
+  summarise(
+    Final_grade_mean = mean(Final_grade, na.rm = T),
+    Final_grade_sd = sd(Final_grade, na.rm = T),
+    Final_grade_median = median(Final_grade, na.rm = T)
+  )
+```
+
+```
+## # A tibble: 2 x 4
+##   Gender Final_grade_mean Final_grade_sd Final_grade_median
+##   &lt;chr&gt;             &lt;dbl&gt;          &lt;dbl&gt;              &lt;dbl&gt;
+## 1 Female             2.49          1.00                 2.3
+## 2 Male               2.84          0.897                3
+```
+
+---
+
+## Quiz!
+
+Find out the mode of `Final_grade` for each gender (`Female` or `Male`) in each intervention group (`Treatment` or `Control`). (hint: Google it!)
+
+--
+
+```r
+# a function to generate the model
+getmode &lt;- function(v) {
+   uniqv &lt;- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+dat %&gt;% group_by(Gender, Affirm) %&gt;% 
+  summarise(
+    Final_grade_mode = getmode(Final_grade)
+  )
+```
+
+```
+## # A tibble: 4 x 3
+## # Groups:   Gender [2]
+##   Gender Affirm    Final_grade_mode
+##   &lt;chr&gt;  &lt;chr&gt;                &lt;dbl&gt;
+## 1 Female Control                2.3
+## 2 Female Treatment              1.7
+## 3 Male   Control                3.7
+## 4 Male   Treatment              3.7
+```
+
+
+---
+## 2. `psych::describe()`
+
+```r
+dat.s &lt;- dat %&gt;% select(Final_grade:Baseline_stereotype_endorsement)
+df &lt;- psych::describe(dat.s) %&gt;% 
+  as.data.frame() %&gt;%
+  rownames_to_column(var = "varnames") %&gt;%
+  mutate_if(is.numeric, round, 3)
+```
+
+<div id="htmlwidget-4788eb0f6542254650ce" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4788eb0f6542254650ce">{"x":{"filter":"none","data":[["1","2","3","4"],["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],[1,2,3,4],[100,100,100,100],[2.72,72.838,0.14,2.42],[0.943,12.735,0.918,1.281],[2.7,73.865,0.09,2.5],[2.761,73.868,0.175,2.312],[1.483,13.618,0.934,2.224],[0,38.56,-2.24,1],[4,92.92,1.8,5],[4,54.36,4.04,4],[-0.381,-0.689,-0.338,0.362],[-0.702,0.046,-0.028,-1.002],[0.094,1.273,0.092,0.128]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>varnames<\/th>\n      <th>vars<\/th>\n      <th>n<\/th>\n      <th>mean<\/th>\n      <th>sd<\/th>\n      <th>median<\/th>\n      <th>trimmed<\/th>\n      <th>mad<\/th>\n      <th>min<\/th>\n      <th>max<\/th>\n      <th>range<\/th>\n      <th>skew<\/th>\n      <th>kurtosis<\/th>\n      <th>se<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+## Quiz!
+
+**Could you get descriptive statistics separately for females and males?**
+
+Hints:
+- Do it manually: use `group_by()` with pipes (`%&gt;%`).
+- Do it with an existing function: consider `psych::describe.by()`.
+
+---
+
+## 3. `skimr::skim()`
+
+```r
+df &lt;- skimr::skim(dat.s) %&gt;% 
+  mutate_if(is.numeric, round, 3)
+```
+
+<div id="htmlwidget-c403df594d6f69bdffa0" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-c403df594d6f69bdffa0">{"x":{"filter":"none","data":[["1","2","3","4"],["numeric","numeric","numeric","numeric"],["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],[0,0,0,0],[1,1,1,1],[2.72,72.838,0.14,2.42],[0.943,12.735,0.918,1.281],[0,38.56,-2.24,1],[2,64.665,-0.41,1],[2.7,73.865,0.09,2.5],[3.7,82.92,0.745,3],[4,92.92,1.8,5],["▁▁▇▅▇","▂▃▆▇▇","▁▂▇▆▅","▇▃▇▃▂"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>skim_type<\/th>\n      <th>skim_variable<\/th>\n      <th>n_missing<\/th>\n      <th>complete_rate<\/th>\n      <th>numeric.mean<\/th>\n      <th>numeric.sd<\/th>\n      <th>numeric.p0<\/th>\n      <th>numeric.p25<\/th>\n      <th>numeric.p50<\/th>\n      <th>numeric.p75<\/th>\n      <th>numeric.p100<\/th>\n      <th>numeric.hist<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+## 4. Plots
+
+
+```r
+# histogram
+hist(dat$Final_grade, main = "Final grades", xlab = "Distribution of final grades")
+```
+
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+# boxplot
+boxplot(dat$Final_grade, main = "Final grades", ylab = "Distribution of final grades")
+```
+
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+# scatterplot
+plot(dat$Final_grade, dat$Final_score, xlab = "Final grades", ylab = "Final scores")
+```
+
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+---
+
+# Descriptive analysis with categorical variables
+
+## 1. Do it manually
+
+.font10[
+
+```r
+table(dat$Affirm)
+```
+
+```
+## 
+##   Control Treatment 
+##        40        60
+```
+
+```r
+table(dat$Affirm, dat$Gender)
+```
+
+```
+##            
+##             Female Male
+##   Control       12   28
+##   Treatment     22   38
+```
+
+```r
+prop.table(table(dat$Affirm, dat$Gender))
+```
+
+```
+##            
+##             Female Male
+##   Control     0.12 0.28
+##   Treatment   0.22 0.38
+```
+]
+
+---
+
+## 2. `tldr::KreateTableOne`
+
+.font10[
+
+```r
+dat.s &lt;- dat %&gt;% select(Affirm, Gender, Cohort, Baseline_stereotype_endorsement)
+
+gen.ftab &lt;- function(data){
+  
+  x &lt;- as.data.frame(sapply(data, as.character))
+  
+  ftab &lt;- suppressMessages(tldr::KreateTableOne(x)) # suppress this
+  var = rownames(ftab)
+  ftab &lt;- as.data.frame(ftab) %&gt;% mutate(Variable = var, .before = 'Overall')
+  
+  return(ftab)
+}
+
+df &lt;- gen.ftab(dat.s)
+```
+]
+
+<div id="htmlwidget-9046b53b395acafc0f79" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9046b53b395acafc0f79">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10"],["n","Affirm = Treatment (%)","Gender = Male (%)","Cohort = B (%)","Baseline_stereotype_endorsement (%)","   1","   2","   3","   4","   5"],["100"," 60 (60.0) "," 66 (66.0) "," 55 (55.0) "," "," 35 (35.0) "," 15 (15.0) "," 30 (30.0) "," 13 (13.0) ","  7 ( 7.0) "]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Variable<\/th>\n      <th>Overall<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollY":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+
+---
+
+## 3. Plots
+
+
+```r
+# histogram
+barplot(table(dat$Gender), main = "Frequency of gender")
+```
+
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+
+---
+
+# A much better way of plotting
+
+`esquisse::esquisser()` is a `ggplot2::ggplot` builder that lets you explore your data quickly to extract the information (and the codes!) they hold. 
+
+
+```r
+esquisse::esquisser()
+```
+
+### Let's walk through it together!
+
+---
+
+# Chi-squared test
+
+We wish to know whether the assignment to treatment/control is independent from students' gender. We need to first create the contingency table to calculate the chi-squared statistic.
+
+
+```r
+cont.table &lt;- table(dat$Affirm, dat$Gender)
+chisq.test(cont.table)
+```
+
+```
+## 
+## 	Pearson's Chi-squared test with Yates' continuity
+## 	correction
+## 
+## data:  cont.table
+## X-squared = 0.22467, df = 1, p-value = 0.6355
+```
+
+--
+
+## Quiz
+Could you generate a contingency table without using the dollar sign (`$`) to refer to variables? (Hint: use `select()`)
+
+---
+
+The assumptions of the chi-squared test include: 
+- The data in the cells should be frequencies, or counts of cases rather than percentages or some other transformation of the data. 
+- The levels (or categories) of the variables are mutually exclusive.
+
+**Hypothesis testing:**
+
+- H0: Variable A and Variable B are independent.
+ 
+- H1: Variable A and Variable B are not independent.
+
+
+```r
+chisq.test(cont.table)
+```
+
+```
+## 
+## 	Pearson's Chi-squared test with Yates' continuity
+## 	correction
+## 
+## data:  cont.table
+## X-squared = 0.22467, df = 1, p-value = 0.6355
+```
+
+`\(df = (r-1)(c-1) = (2-1)*(2-1) = 1\)`
+
+**APA reporting:** From the results above, there is not a statistically significant relationship between treatment assignment and gender ( `\(\chi^2(1, N = 100) = 0.347, p = 0.556\)` ).
+
+---
+
+# Correlation
+
+
+```r
+dat.s &lt;- dat %&gt;% select(Final_grade:Baseline_stereotype_endorsement)
+
+# Pearson r correlation is the most widely used correlation statistic to measure the degree of the relationship between linearly related variables.
+cor(dat.s, method = "pearson")
+```
+
+```
+##                                 Final_grade Final_score
+## Final_grade                      1.00000000  0.96489451
+## Final_score                      0.96489451  1.00000000
+## Baseline_math_score              0.42376984  0.41390935
+## Baseline_stereotype_endorsement  0.05486242  0.02378856
+##                                 Baseline_math_score
+## Final_grade                               0.4237698
+## Final_score                               0.4139094
+## Baseline_math_score                       1.0000000
+## Baseline_stereotype_endorsement           0.1180796
+##                                 Baseline_stereotype_endorsement
+## Final_grade                                          0.05486242
+## Final_score                                          0.02378856
+## Baseline_math_score                                  0.11807961
+## Baseline_stereotype_endorsement                      1.00000000
+```
+
+
+---
+
+
+```r
+# Spearman r correlation is a nonparametric measure of rank correlation (statistical dependence between the rankings of two variables)
+cor(dat.s, method = "spearman")
+```
+
+```
+##                                 Final_grade Final_score
+## Final_grade                       1.0000000   0.9883654
+## Final_score                       0.9883654   1.0000000
+## Baseline_math_score               0.4445366   0.4261019
+## Baseline_stereotype_endorsement   0.1042726   0.1026911
+##                                 Baseline_math_score
+## Final_grade                               0.4445366
+## Final_score                               0.4261019
+## Baseline_math_score                       1.0000000
+## Baseline_stereotype_endorsement           0.1501881
+##                                 Baseline_stereotype_endorsement
+## Final_grade                                           0.1042726
+## Final_score                                           0.1026911
+## Baseline_math_score                                   0.1501881
+## Baseline_stereotype_endorsement                       1.0000000
+```
+
+---
+
+**Hypothesis testing:**
+
+- H0: Variable A and Variable B has a zero correlation.
+
+- H1: Variable A and Variable B are non-zero correlation.
+
+.font10[
+
+```r
+psych::corr.test(dat.s, use = "complete")
+psych::corr.test(dat.s, use = "pairwise")
+psych::corr.test(dat.s, method = "spearman", use = "pairwise")
+```
+
+I have also prepared a function for you to add significance stars to the correlation matrix (**YES, function-writing is an essential part of the coding experience!**).
+
+
+```r
+corstarsl &lt;- function(x){ 
+x &lt;- as.matrix(x) 
+R &lt;- Hmisc::rcorr(x)$r 
+p &lt;- Hmisc::rcorr(x)$P 
+
+## define notions for significance levels; spacing is important.
+mystars &lt;- ifelse(p &lt; .001, "***", ifelse(p &lt; .01, "**", ifelse(p &lt; .05, "*", "")))
+## trunctuate the matrix that holds the correlations to two decimal
+R &lt;- format(round(cbind(rep(-1.11, ncol(x)), R), 3))[,-1] 
+## build a new matrix that includes the correlations with their apropriate stars 
+Rnew &lt;- matrix(paste(R, mystars, sep=""), ncol=ncol(x)) 
+diag(Rnew) &lt;- paste(diag(R), " ", sep="") 
+rownames(Rnew) &lt;- colnames(x) 
+colnames(Rnew) &lt;- paste(colnames(x), "", sep="") 
+## remove upper triangle
+Rnew &lt;- as.matrix(Rnew)
+Rnew[upper.tri(Rnew, diag = TRUE)] &lt;- "--"
+Rnew[upper.tri(Rnew)] &lt;- ""
+Rnew &lt;- as.data.frame(Rnew) 
+## remove last column and return the matrix (which is now a data frame)
+Rnew &lt;- cbind(Rnew[1:length(Rnew)])
+return(Rnew) 
+} 
+```
+]
+
+---
+
+The output looks like this:
+
+
+```r
+corstarsl(dat.s)
+```
+
+<div id="htmlwidget-97f15d23182965483cd1" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-97f15d23182965483cd1">{"x":{"filter":"none","data":[["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],["--"," 0.965***"," 0.424***"," 0.055"],["","--"," 0.414***"," 0.024"],["","","--"," 0.118"],["","","","--"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Final_grade<\/th>\n      <th>Final_score<\/th>\n      <th>Baseline_math_score<\/th>\n      <th>Baseline_stereotype_endorsement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+
+**(\*\*\* 0.001, \*\* 0.01, \* 0.05)**
+
+`\(df = N-2\)`
+
+**APA reporting**: Baseline Math score is positively correlated with final exam scores: `\(r(462) = .42, p &lt; .001\)`.
+
+---
+
+# T-test
+
+T-test is used to compare two means. The common assumptions made when doing a t-test include those regarding the scale of measurement, random sampling, normality of data distribution, adequacy of sample size and equality of variance in standard deviation.
+
+
+```r
+# compared a mean to a constant value 
+t.test(dat$Final_score, mu = 72)
+```
+
+```
+## 
+## 	One Sample t-test
+## 
+## data:  dat$Final_score
+## t = 0.65795, df = 99, p-value = 0.5121
+## alternative hypothesis: true mean is not equal to 72
+## 95 percent confidence interval:
+##  70.3110 75.3648
+## sample estimates:
+## mean of x 
+##   72.8379
+```
+
+The probability that we would observe a test statistic different from t* = 0.660 if the population mean really were 72.
+
+---
+
+.font10[
+
+```r
+# compare two independent means
+t.test(Final_score ~ Gender, data = dat)
+```
+
+```
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  Final_score by Gender
+## t = -1.3232, df = 63.421, p-value = 0.1905
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -9.061356  1.841338
+## sample estimates:
+## mean in group Female   mean in group Male 
+##             70.45529             74.06530
+```
+
+```r
+# summary stats for reporting
+dat %&gt;% group_by(Gender) %&gt;% 
+  summarize(m = mean(Final_score,na.rm = T),
+            sd = sd(Final_score,na.rm = T))
+```
+
+```
+## # A tibble: 2 x 3
+##   Gender     m    sd
+##   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;
+## 1 Female  70.5  13.2
+## 2 Male    74.1  12.4
+```
+
+**APA reporting**: Girls do not score differently on physics exams (M = 70.5, SD = 13.2) than boys (M = 74.1, SD = 12.4), `\(t(98) = -1.3232, p = .191\)`.
+
+You can also conduct one-tailed tests with the `alternative` argument.
+
+
+```r
+t.test(Final_score ~ Gender, alternative = "greater", data = dat) # x has a larger mean than y
+t.test(Final_score ~ Gender, alternative = "less", data = dat) # x has a smaller mean than y
+t.test(Final_score ~ Gender, alternative = "two.sided", data = dat) # x has a equal mean as compared to y
+```
+
+]
+
+---
+
+# ANOVA (Analysis of Variance)
+
+ANOVA provides a statistical test of whether two or more population means are equal, and therefore generalizes the t-test beyond two means
+
+**It is needed because We CANNOT do multiple t-tests!**
+
+The ANOVA F-test is a comparison of the average variability between groups(Var_between) to the average variability within groups (Var_within).
+
+`\(F = Var_{between}/Var_{within} = MS_B/MS_W\)`
+
+Assumptions:
+- observations drawn from random sample and independent from each other.
+- observations normally distributed within each group.
+- Variances approximately equal across groups
+
+**Hypothesis testing:**
+
+- H0: All means are equal across groups.
+
+- H1: Not all means are equal across groups.
+
+---
+
+.font10[
+
+```r
+# single factor anova
+fit &lt;- aov(Final_score ~ Affirm, dat)
+summary(fit)
+```
+
+```
+##             Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Affirm       1    295   294.9   1.834  0.179
+## Residuals   98  15761   160.8
+```
+]
+
+**APA reporting**: There was not a significant effect of self-affirmation on course score at the p &lt; .05 level for the two conditions ( `\(F(1, 462) = 0.928, p = 0.336\)` ).
+
+**Tukey HSD post-hoc diagnosis**: It is ‘protected’ against the inflated risk of Type I error that arises when multiple significance tests are performed.
+
+In effect, the Tukey HSD uses a larger critical value to judge statistical significance than would be used in an ordinary t test, and the critical value for Tukey HSD increases as the number of comparisons of means increases.
+
+.font10[
+
+```r
+TukeyHSD(fit)
+```
+
+```
+##   Tukey multiple comparisons of means
+##     95% family-wise confidence level
+## 
+## Fit: aov(formula = Final_score ~ Affirm, data = dat)
+## 
+## $Affirm
+##                      diff      lwr     upr     p adj
+## Treatment-Control 3.50525 -1.63183 8.64233 0.1788228
+```
+]
+
+---
+
+You can also plot the subgroup difference(s):
+
+
+```r
+par(mfrow = c(1,1), mar = c(5,8,4,2), las = 1) 
+# MultiFrame rowwise layout (mfrow), margin size (mar), axis label locations (mgp), and axis label orientation (las).
+plot(TukeyHSD(fit))
+```
+
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+# double factor anova
+fit &lt;- aov(Final_score ~ Affirm*Gender, dat)
+summary(fit)
+```
+
+```
+##               Df Sum Sq Mean Sq F value Pr(&gt;F)
+## Affirm         1    295   294.9   1.848  0.177
+## Gender         1    336   335.9   2.106  0.150
+## Affirm:Gender  1    110   110.4   0.692  0.408
+## Residuals     96  15315   159.5
+```
+
+
+`Affirm` has 2 levels, so df = (a - 1) = 1
+
+`Gender` has 2 levels, so df = (b - 1) = 1
+
+`Affirm` **:** `Gender`  df = (a - 1) x (b - 1) = 1
+
+Observations n = 100
+
+Total df = (n - 1) = 99
+
+Residual (error) df = Total - (a-1) - (b-1) - (a-1) x (b-1)  = 96
+
+Becasue there is no missingness, model df = 96 - 0 = 96
+
+**APA reporting**: A two-way ANOVA was conducted that examined if the effect of self-affirmation on course score was moderated by students' gender. There was not a statistically significant interaction between the effects of affirmation and gender on course score ( `\(F (1, 96) = 0.692, p = .408\)` ).
+
+---
+
+Interaction effects are difficult to interpret, plot it!
+
+
+
+
+```r
+with(dat, interaction.plot( Gender, Affirm, Final_score, 
+                           type = "b", col = c("red", "blue"), 
+                           pch = c(16,18)))
+```
+
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-38-1.png)&lt;!-- --&gt;
+
+---
+
+# Simple regression
+
+We use the `lm()` function to build linear regression models.
+
+
+```r
+fit1 &lt;- lm(Final_score ~ Baseline_math_score, dat)
+summary(fit1) 
+```
+
+```
+## 
+## Call:
+## lm(formula = Final_score ~ Baseline_math_score, data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -38.221  -5.684   1.588   8.390  23.346 
+## 
+## Coefficients:
+##                     Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)           72.034      1.179  61.107  &lt; 2e-16 ***
+## Baseline_math_score    5.741      1.275   4.501 1.86e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 11.65 on 98 degrees of freedom
+## Multiple R-squared:  0.1713,	Adjusted R-squared:  0.1629 
+## F-statistic: 20.26 on 1 and 98 DF,  p-value: 1.863e-05
+```
+
+---
+
+
+```r
+ggplot(dat, aes(x = Baseline_math_score, y = Final_score)) + 
+  geom_point() +
+  geom_smooth(method = "lm", fill = NA) +
+  theme_bw()
+```
+
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-40-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+# add a quadratic term
+fit2 &lt;- lm(Final_score ~ Baseline_math_score + I(Baseline_math_score^2) + I(Baseline_math_score^3) , data = dat)
+summary(fit2)
+```
+
+```
+## 
+## Call:
+## lm(formula = Final_score ~ Baseline_math_score + I(Baseline_math_score^2) + 
+##     I(Baseline_math_score^3), data = dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -38.254  -5.936   1.845   8.400  23.897 
+## 
+## Coefficients:
+##                          Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)               72.3300     1.4847  48.715   &lt;2e-16 ***
+## Baseline_math_score        6.2202     2.7155   2.291   0.0242 *  
+## I(Baseline_math_score^2)  -0.4039     1.1185  -0.361   0.7188    
+## I(Baseline_math_score^3)  -0.2005     0.9787  -0.205   0.8381    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 11.76 on 96 degrees of freedom
+## Multiple R-squared:  0.1725,	Adjusted R-squared:  0.1466 
+## F-statistic:  6.67 on 3 and 96 DF,  p-value: 0.0003874
+```
+
+---
+
+
+```r
+ggplot(dat, aes(x = Baseline_math_score, y = Final_score)) + 
+  geom_jitter() +
+  geom_smooth(method = "lm", color = "blue", fill = NA) +
+  geom_smooth(method = "lm", formula = y ~ x + I(x^2), color = "red") + 
+    geom_smooth(method = "lm", formula = y ~ x + I(x^2) + I(x^3), color = "green")+
+  theme_bw()
+```
+
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-42-1.png)&lt;!-- --&gt;
+
+---
+
+# Multiple regression
+
+Building multiple regression is also easy as you can add many predictors into the same equation.
+
+
+```r
+M1 &lt;- lm(Final_score ~ Baseline_math_score, data = dat)
+M2 &lt;- lm(Final_score ~ Baseline_math_score + Affirm, data = dat)
+M3 &lt;- lm(Final_score ~ Baseline_math_score + Affirm*Gender, data = dat)
+M4 &lt;- lm(Final_score ~ Baseline_math_score + Affirm*Gender + Cohort, data = dat)
+```
+
+The `lm` output is useful enough if you just want to read it. However, you would need to run something like `coef(summary(fit))` to extract the coefficients and put them into tabular data. Model comparison is also annoying if you run `summary()` on each model. 
+
+Here are a few existing packages to help you with table generation of model outputs.
+
+---
+
+# `broom::tidy`
+
+`broom::tidy` gives you a nice tabular output of your model. Note it also with all the statistical methods I've talked about so far!
+
+.font10[
+
+```r
+# estimates
+broom::tidy(fit1)
+```
+
+```
+## # A tibble: 2 x 5
+##   term                estimate std.error statistic  p.value
+##   &lt;chr&gt;                  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Intercept)            72.0       1.18     61.1  7.81e-80
+## 2 Baseline_math_score     5.74      1.28      4.50 1.86e- 5
+```
+
+```r
+# model fit
+broom::glance(fit1)
+```
+
+```
+## # A tibble: 1 x 12
+##   r.squared adj.r.squared sigma statistic p.value    df logLik
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+## 1     0.171         0.163  11.7      20.3 1.86e-5     1  -386.
+## # … with 5 more variables: AIC &lt;dbl&gt;, BIC &lt;dbl&gt;, deviance &lt;dbl&gt;,
+## #   df.residual &lt;int&gt;, nobs &lt;int&gt;
+```
+]
+
+---
+
+# `texreg::htmlreg`
+
+`texreg::htmlreg` is probably the most handy function to generate tables of model comparisons. 
+
+Note `texreg::texreg` gives you LaTex output and `texreg::screenreg` allows you to quickly see the output in R console. You need to specify `results = "asis"` in the chunk header to knit the results.
+
+---
+
+.font10[
+
+```r
+texreg::htmlreg(
+  list(M1,M2,M3,M4),
+  custom.model.names = c("M1", "M2", "M3", "M4"),
+  caption = "Test models",
+  digits = 3
+)
+```
+
+&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
+&lt;caption&gt;Test models&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;M1&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;M2&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;M3&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;M4&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(Intercept)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;72.034&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70.119&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;66.726&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;64.921&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.179)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.840)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(3.363)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(3.618)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Baseline_math_score&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;5.741&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;5.692&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;5.532&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;5.940&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.275)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.271)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.300)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.331)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;AffirmTreatment&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;3.203&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;6.677&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;6.639&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(2.369)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(4.176)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(4.160)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;GenderMale&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;4.872&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;5.113&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(4.039)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(4.027)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;AffirmTreatment:GenderMale&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-4.958&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-5.326&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(5.083)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(5.071)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;CohortB&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;3.184&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(2.409)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.171&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.187&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.199&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.214&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.163&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.170&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.165&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.172&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-bottom: 2px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;100&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;100&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;100&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;100&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;
+&lt;tr&gt;
+&lt;td style="font-size: 0.8em;" colspan="5"&gt;&lt;sup&gt;***&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;**&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tfoot&gt;
+&lt;/table&gt;
+]
+
+---
+
+# Regression diagnostics
+
+Assumptions:
+
+- Linearity: The relationship between X and the mean of Y is linear.
+
+- Homoscedasticity: The variance of residual is the same for any value of X.
+
+- Independence: Observations are independent of each other.
+
+- Normality: For any fixed value of X, Y is normally distributed.
+
+---
+
+
+```r
+par(mfrow = c(2,2))
+plot(M2)
+```
+
+![](05-modeling-with-r_files/figure-html/unnamed-chunk-46-1.png)&lt;!-- --&gt;
+
+---
+
+# Residuals vs. fitted plot
+
+.pull-left[
+&lt;img src="../images/residual-vs-fitted.png" height="300"&gt;
+]
+
+.pull-right[
+The plot of residuals versus predicted values is useful for checking the assumption of **linearity and homoscedasticity**. 
+
+If the model does not meet the linear model assumption, we would expect to see residuals that are very large (big positive value or big negative value). To assess the assumption of linearity we want to ensure that **the residuals are not too far away from 0** (standardized values less than -2 or greater than 2 are deemed problematic). To assess if the homoscedasticity assumption is met we look to make sure that **there is no pattern in the residuals and that they are equally spread around the y = 0 line**.
+]
+
+---
+
+# QQ plot
+
+.pull-left[
+&lt;img src="../images/qq-plot.png" height="300"&gt;
+]
+
+.pull-right[
+The **normality** assumption is evaluated based on the residuals and can be evaluated using a QQ-plot (plot 2) by comparing the residuals to "ideal" normal observations. 
+
+**Observations lie well along the 45-degree line in the QQ-plot**, so we may assume that normality holds here.
+]
+
+---
+
+# Scale-location plot
+
+.pull-left[
+&lt;img src="../images/scale-location.png" height="300"&gt;
+]
+
+.pull-right[
+The third plot is a scale-location plot (square rooted standardized residual vs. predicted value). This is useful for checking the assumption of **homoscedasticity**. In this particular plot we are checking to see if there is a pattern in the residuals.
+
+The assumption of **a random sample and independent observations** cannot be tested with diagnostic plots. It is an assumption that you can test by examining the study design.
+]
+
+---
+
+# Residual vs. leverage plot
+
+.pull-left[
+&lt;img src="../images/residual-vs-leverage.png" height="300"&gt;
+]
+
+.pull-right[
+The fourth plot is of "Cook's distance", which is a measure of **the influence of each observation on the regression coefficients**. 
+
+The Cook's distance statistic is a measure, for each observation in turn, of the extent of change in model estimates when that particular observation is omitted. **Any observation for which the Cook's distance is close to 1 or more**, or **that is substantially larger than other Cook's distances** (highly influential data points), requires investigation.
+]
+
+Outliers may or may not be influential points. **Influential outliers are of the greatest concern**. They should never be disregarded. Careful scrutiny of the original data may reveal an error in data entry that can be corrected. If they remain excluded from the final fitted model, they must be noted in the final report or paper.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"highlightLines": true,
+"highlightStyle": "solarized-light",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
