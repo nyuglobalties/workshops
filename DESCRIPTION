@@ -20,4 +20,15 @@ Imports:
     openxlsx,
     ggthemes,
     esquisse,
-    glue
+    glue,
+    tidyverse,
+    psych,
+    here,
+    skimr,
+    tldr,
+    esquisse,
+    broom,
+    texreg,
+    remotes
+Remotes:
+    nyuglobalties/rcoder
