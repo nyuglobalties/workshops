@@ -678,6 +678,12 @@ summary(fit1)
 
 ---
 
+## Quiz!
+
+Use the ggplot builder to generate a scatterplot with `Baseline_math_score` on the x axis and the `Final_score` on the y axis. Copy the code and manually adjust `method = ""` in the `geom_smooth()` function to change the fitted line from loess to linear.
+
+---
+
 ```{r, fig.height=4, dpi = 300}
 ggplot(dat, aes(x = Baseline_math_score, y = Final_score)) + 
   geom_point() +
@@ -725,7 +731,7 @@ Here are a few existing packages to help you with table generation of model outp
 
 # `broom::tidy`
 
-`broom::tidy` gives you a nice tabular output of your model. Note it also with all the statistical methods I've talked about so far!
+`broom::tidy` gives you a nice tabular output of your model. Note it also works with all the statistical methods I've talked about so far!
 
 .font10[
 ```{r}
@@ -835,3 +841,7 @@ The Cook's distance statistic is a measure, for each observation in turn, of the
 ]
 
 Outliers may or may not be influential points. **Influential outliers are of the greatest concern**. They should never be disregarded. Careful scrutiny of the original data may reveal an error in data entry that can be corrected. If they remain excluded from the final fitted model, they must be noted in the final report or paper.
+
+---
+#Thank you!
+---

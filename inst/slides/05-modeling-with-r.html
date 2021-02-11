@@ -3,7 +3,7 @@
   <head>
     <title>Session 5</title>
     <meta charset="utf-8" />
-    <meta name="date" content="2021-02-03" />
+    <meta name="date" content="2021-02-10" />
     <script src="05-modeling-with-r_files/header-attrs/header-attrs.js"></script>
     <script src="05-modeling-with-r_files/htmlwidgets/htmlwidgets.js"></script>
     <script src="05-modeling-with-r_files/jquery/jquery.min.js"></script>
@@ -23,7 +23,7 @@ class: center, middle, inverse, title-slide
 # Session 5
 ## Have fun modeling with R
 ### Global TIES for Children
-### 2021-02-03
+### 2021-02-10
 
 ---
 
@@ -196,8 +196,8 @@ dat &lt;- read_csv(here::here("data/sample_intervention_dataset.csv"))
 head(dat)
 ```
 
-<div id="htmlwidget-22a39b7ffdb508097e29" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-22a39b7ffdb508097e29">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],[1,2,3,4,5,6],[1,2,3,6,9,11],["A","A","A","A","A","A"],[-1,1,1,-1,-1,-1],[1,0,0,0,0,0],[3.7,2.7,2.3,3.7,4,4],[83.07,70.84,69.23,83.96,88.15,89.73],[0.48,1.13,-0.17,1.79,-0.04,1.79],[2,2,1,1,3,3]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>X1<\/th>\n      <th>Coded_ID<\/th>\n      <th>Cohort<\/th>\n      <th>Intervention<\/th>\n      <th>Female<\/th>\n      <th>Final_grade<\/th>\n      <th>Final_score<\/th>\n      <th>Baseline_math_score<\/th>\n      <th>Baseline_stereotype_endorsement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":3,"scrollX":true,"scrollY":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-716014e11a66519e993f" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-716014e11a66519e993f">{"x":{"filter":"none","data":[["1","2","3","4","5","6"],[1,2,3,4,5,6],[1,2,3,6,9,11],["A","A","A","A","A","A"],[-1,1,1,-1,-1,-1],[1,0,0,0,0,0],[3.7,2.7,2.3,3.7,4,4],[83.07,70.84,69.23,83.96,88.15,89.73],[0.48,1.13,-0.17,1.79,-0.04,1.79],[2,2,1,1,3,3]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>X1<\/th>\n      <th>Coded_ID<\/th>\n      <th>Cohort<\/th>\n      <th>Intervention<\/th>\n      <th>Female<\/th>\n      <th>Final_grade<\/th>\n      <th>Final_score<\/th>\n      <th>Baseline_math_score<\/th>\n      <th>Baseline_stereotype_endorsement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":3,"scrollX":true,"scrollY":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[3,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -354,8 +354,8 @@ df &lt;- psych::describe(dat.s) %&gt;%
   mutate_if(is.numeric, round, 3)
 ```
 
-<div id="htmlwidget-388f854e6df1104e65df" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-388f854e6df1104e65df">{"x":{"filter":"none","data":[["1","2","3","4"],["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],[1,2,3,4],[100,100,100,100],[2.72,72.838,0.14,2.42],[0.943,12.735,0.918,1.281],[2.7,73.865,0.09,2.5],[2.761,73.868,0.175,2.312],[1.483,13.618,0.934,2.224],[0,38.56,-2.24,1],[4,92.92,1.8,5],[4,54.36,4.04,4],[-0.381,-0.689,-0.338,0.362],[-0.702,0.046,-0.028,-1.002],[0.094,1.273,0.092,0.128]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>varnames<\/th>\n      <th>vars<\/th>\n      <th>n<\/th>\n      <th>mean<\/th>\n      <th>sd<\/th>\n      <th>median<\/th>\n      <th>trimmed<\/th>\n      <th>mad<\/th>\n      <th>min<\/th>\n      <th>max<\/th>\n      <th>range<\/th>\n      <th>skew<\/th>\n      <th>kurtosis<\/th>\n      <th>se<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-b9d13105a295fc2fce45" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-b9d13105a295fc2fce45">{"x":{"filter":"none","data":[["1","2","3","4"],["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],[1,2,3,4],[100,100,100,100],[2.72,72.838,0.14,2.42],[0.943,12.735,0.918,1.281],[2.7,73.865,0.09,2.5],[2.761,73.868,0.175,2.312],[1.483,13.618,0.934,2.224],[0,38.56,-2.24,1],[4,92.92,1.8,5],[4,54.36,4.04,4],[-0.381,-0.689,-0.338,0.362],[-0.702,0.046,-0.028,-1.002],[0.094,1.273,0.092,0.128]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>varnames<\/th>\n      <th>vars<\/th>\n      <th>n<\/th>\n      <th>mean<\/th>\n      <th>sd<\/th>\n      <th>median<\/th>\n      <th>trimmed<\/th>\n      <th>mad<\/th>\n      <th>min<\/th>\n      <th>max<\/th>\n      <th>range<\/th>\n      <th>skew<\/th>\n      <th>kurtosis<\/th>\n      <th>se<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -376,8 +376,8 @@ df &lt;- skimr::skim(dat.s) %&gt;%
   mutate_if(is.numeric, round, 3)
 ```
 
-<div id="htmlwidget-5265bf63b3920e0034ac" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-5265bf63b3920e0034ac">{"x":{"filter":"none","data":[["1","2","3","4"],["numeric","numeric","numeric","numeric"],["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],[0,0,0,0],[1,1,1,1],[2.72,72.838,0.14,2.42],[0.943,12.735,0.918,1.281],[0,38.56,-2.24,1],[2,64.665,-0.41,1],[2.7,73.865,0.09,2.5],[3.7,82.92,0.745,3],[4,92.92,1.8,5],["▁▁▇▅▇","▂▃▆▇▇","▁▂▇▆▅","▇▃▇▃▂"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>skim_type<\/th>\n      <th>skim_variable<\/th>\n      <th>n_missing<\/th>\n      <th>complete_rate<\/th>\n      <th>numeric.mean<\/th>\n      <th>numeric.sd<\/th>\n      <th>numeric.p0<\/th>\n      <th>numeric.p25<\/th>\n      <th>numeric.p50<\/th>\n      <th>numeric.p75<\/th>\n      <th>numeric.p100<\/th>\n      <th>numeric.hist<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-a7720532e6e4479d38fc" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-a7720532e6e4479d38fc">{"x":{"filter":"none","data":[["1","2","3","4"],["numeric","numeric","numeric","numeric"],["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],[0,0,0,0],[1,1,1,1],[2.72,72.838,0.14,2.42],[0.943,12.735,0.918,1.281],[0,38.56,-2.24,1],[2,64.665,-0.41,1],[2.7,73.865,0.09,2.5],[3.7,82.92,0.745,3],[4,92.92,1.8,5],["▁▁▇▅▇","▂▃▆▇▇","▁▂▇▆▅","▇▃▇▃▂"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>skim_type<\/th>\n      <th>skim_variable<\/th>\n      <th>n_missing<\/th>\n      <th>complete_rate<\/th>\n      <th>numeric.mean<\/th>\n      <th>numeric.sd<\/th>\n      <th>numeric.p0<\/th>\n      <th>numeric.p25<\/th>\n      <th>numeric.p50<\/th>\n      <th>numeric.p75<\/th>\n      <th>numeric.p100<\/th>\n      <th>numeric.hist<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -476,8 +476,8 @@ df &lt;- gen.ftab(dat.s)
 ```
 ]
 
-<div id="htmlwidget-abf7ca3b50fc0712f573" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-abf7ca3b50fc0712f573">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10"],["n","Affirm = Treatment (%)","Gender = Male (%)","Cohort = B (%)","Baseline_stereotype_endorsement (%)","   1","   2","   3","   4","   5"],["100"," 60 (60.0) "," 66 (66.0) "," 55 (55.0) "," "," 35 (35.0) "," 15 (15.0) "," 30 (30.0) "," 13 (13.0) ","  7 ( 7.0) "]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Variable<\/th>\n      <th>Overall<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollY":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-872fa09e0c473d7f7f9e" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-872fa09e0c473d7f7f9e">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10"],["n","Affirm = Treatment (%)","Gender = Male (%)","Cohort = B (%)","Baseline_stereotype_endorsement (%)","   1","   2","   3","   4","   5"],["100"," 60 (60.0) "," 66 (66.0) "," 55 (55.0) "," "," 35 (35.0) "," 15 (15.0) "," 30 (30.0) "," 13 (13.0) ","  7 ( 7.0) "]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Variable<\/th>\n      <th>Overall<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollY":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -518,7 +518,8 @@ chisq.test(cont.table)
 
 ```
 ## 
-## 	Pearson's Chi-squared test with Yates' continuity correction
+## 	Pearson's Chi-squared test with Yates' continuity
+## 	correction
 ## 
 ## data:  cont.table
 ## X-squared = 0.22467, df = 1, p-value = 0.6355
@@ -548,7 +549,8 @@ chisq.test(cont.table)
 
 ```
 ## 
-## 	Pearson's Chi-squared test with Yates' continuity correction
+## 	Pearson's Chi-squared test with Yates' continuity
+## 	correction
 ## 
 ## data:  cont.table
 ## X-squared = 0.22467, df = 1, p-value = 0.6355
@@ -571,11 +573,16 @@ cor(dat.s, method = "pearson")
 ```
 
 ```
-##                                 Final_grade Final_score Baseline_math_score
-## Final_grade                      1.00000000  0.96489451           0.4237698
-## Final_score                      0.96489451  1.00000000           0.4139094
-## Baseline_math_score              0.42376984  0.41390935           1.0000000
-## Baseline_stereotype_endorsement  0.05486242  0.02378856           0.1180796
+##                                 Final_grade Final_score
+## Final_grade                      1.00000000  0.96489451
+## Final_score                      0.96489451  1.00000000
+## Baseline_math_score              0.42376984  0.41390935
+## Baseline_stereotype_endorsement  0.05486242  0.02378856
+##                                 Baseline_math_score
+## Final_grade                               0.4237698
+## Final_score                               0.4139094
+## Baseline_math_score                       1.0000000
+## Baseline_stereotype_endorsement           0.1180796
 ##                                 Baseline_stereotype_endorsement
 ## Final_grade                                          0.05486242
 ## Final_score                                          0.02378856
@@ -593,11 +600,16 @@ cor(dat.s, method = "spearman")
 ```
 
 ```
-##                                 Final_grade Final_score Baseline_math_score
-## Final_grade                       1.0000000   0.9883654           0.4445366
-## Final_score                       0.9883654   1.0000000           0.4261019
-## Baseline_math_score               0.4445366   0.4261019           1.0000000
-## Baseline_stereotype_endorsement   0.1042726   0.1026911           0.1501881
+##                                 Final_grade Final_score
+## Final_grade                       1.0000000   0.9883654
+## Final_score                       0.9883654   1.0000000
+## Baseline_math_score               0.4445366   0.4261019
+## Baseline_stereotype_endorsement   0.1042726   0.1026911
+##                                 Baseline_math_score
+## Final_grade                               0.4445366
+## Final_score                               0.4261019
+## Baseline_math_score                       1.0000000
+## Baseline_stereotype_endorsement           0.1501881
 ##                                 Baseline_stereotype_endorsement
 ## Final_grade                                           0.1042726
 ## Final_score                                           0.1026911
@@ -660,8 +672,8 @@ The output looks like this:
 corstarsl(dat.s)
 ```
 
-<div id="htmlwidget-9518a11481084f2e35f7" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-9518a11481084f2e35f7">{"x":{"filter":"none","data":[["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],["--"," 0.965***"," 0.424***"," 0.055"],["","--"," 0.414***"," 0.024"],["","","--"," 0.118"],["","","","--"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Final_grade<\/th>\n      <th>Final_score<\/th>\n      <th>Baseline_math_score<\/th>\n      <th>Baseline_stereotype_endorsement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-820d816643438d0a02ee" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-820d816643438d0a02ee">{"x":{"filter":"none","data":[["Final_grade","Final_score","Baseline_math_score","Baseline_stereotype_endorsement"],["--"," 0.965***"," 0.424***"," 0.055"],["","--"," 0.414***"," 0.024"],["","","--"," 0.118"],["","","","--"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Final_grade<\/th>\n      <th>Final_score<\/th>\n      <th>Baseline_math_score<\/th>\n      <th>Baseline_stereotype_endorsement<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":4,"scrollX":true,"scrollCollapse":false,"columnDefs":[{"className":"dt-center","targets":"_all"},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[4,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 **(\*\*\* 0.001, \*\* 0.01, \* 0.05)**
 
@@ -909,6 +921,12 @@ summary(fit1)
 
 ---
 
+## Quiz!
+
+Use the ggplot builder to generate a scatterplot with `Baseline_math_score` on the x axis and the `Final_score` on the y axis. Copy the code and manually adjust `method = ""` in the `geom_smooth()` function to change the fitted line from loess to linear.
+
+---
+
 
 ```r
 ggplot(dat, aes(x = Baseline_math_score, y = Final_score)) + 
@@ -939,11 +957,16 @@ summary(fit2)
 ## -38.254  -5.936   1.845   8.400  23.897 
 ## 
 ## Coefficients:
-##                          Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)               72.3300     1.4847  48.715   &lt;2e-16 ***
-## Baseline_math_score        6.2202     2.7155   2.291   0.0242 *  
-## I(Baseline_math_score^2)  -0.4039     1.1185  -0.361   0.7188    
-## I(Baseline_math_score^3)  -0.2005     0.9787  -0.205   0.8381    
+##                          Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)               72.3300     1.4847  48.715   &lt;2e-16
+## Baseline_math_score        6.2202     2.7155   2.291   0.0242
+## I(Baseline_math_score^2)  -0.4039     1.1185  -0.361   0.7188
+## I(Baseline_math_score^3)  -0.2005     0.9787  -0.205   0.8381
+##                             
+## (Intercept)              ***
+## Baseline_math_score      *  
+## I(Baseline_math_score^2)    
+## I(Baseline_math_score^3)    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -988,7 +1011,7 @@ Here are a few existing packages to help you with table generation of model outp
 
 # `broom::tidy`
 
-`broom::tidy` gives you a nice tabular output of your model. Note it also with all the statistical methods I've talked about so far!
+`broom::tidy` gives you a nice tabular output of your model. Note it also works with all the statistical methods I've talked about so far!
 
 .font10[
 
@@ -1012,10 +1035,11 @@ broom::glance(fit1)
 
 ```
 ## # A tibble: 1 x 12
-##   r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
-##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1     0.171         0.163  11.7      20.3 1.86e-5     1  -386.  779.  787.
-## # … with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;
+##   r.squared adj.r.squared sigma statistic p.value    df logLik
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+## 1     0.171         0.163  11.7      20.3 1.86e-5     1  -386.
+## # … with 5 more variables: AIC &lt;dbl&gt;, BIC &lt;dbl&gt;, deviance &lt;dbl&gt;,
+## #   df.residual &lt;int&gt;, nobs &lt;int&gt;
 ```
 ]
 
@@ -1247,6 +1271,10 @@ The Cook's distance statistic is a measure, for each observation in turn, of the
 ]
 
 Outliers may or may not be influential points. **Influential outliers are of the greatest concern**. They should never be disregarded. Careful scrutiny of the original data may reveal an error in data entry that can be corrected. If they remain excluded from the final fitted model, they must be noted in the final report or paper.
+
+---
+#Thank you!
+---
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
