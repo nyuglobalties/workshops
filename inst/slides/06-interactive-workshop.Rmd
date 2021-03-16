@@ -1,0 +1,343 @@
+---
+title: "Session 6: try this at home!"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: cerulean
+    css: html-themer.css
+    toc: true
+    toc_float: true
+    number_sections: true
+  pdf_document: default
+institute: Global TIES for Children
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = F,
+                      warning = F,
+                      eval = F)
+```
+
+# Overview
+
+In the past five workshops, we've covered the following topics:
+
+-   Data preparation: `read_csv()`, `install.packages()`, `library()`
+-   Data inspection: `View()`, `unique()`, `names()`, `str()`, `dim()`, `head()`, `tail()`
+-   Basic data wrangling: `%>%`, `select()`, `filter()`, `arrange()`, `mutate()`, `summarize()`, `group_by()`
+-   Data joining: `inner_join()`, `left_join()`, `right_join()`, `full_join()`
+-   String control using `regex`: `str_c()`, `str_glue()`, `str_subset()`, `str_extract()`, `str_split()`, `str_replace()`
+-   Functions and loops: `function(...){...}`, `for(i in ...){}` **not covered in today's workshop**
+-   Project workflow: **not covered in today's workshop**
+-   Descriptive statistics: `mean()`, `sd()`, `mean()`, `median()`, `psych::describe()`, `skimr::skim()`, `tldr::KreateTableOne()`,
+-   Plots: `esquisse::esquisser()`, `ggplot()`
+-   Modeling: `chisq.test()`, `cor()`, `Hmisc::rcorr()`, `psych::corr.test()`, `t.test()`, `aov()`, `lm()`, `texreg::texreg()`
+
+**That is a lot!!!** No worries, you will get a chance to use some of them through a sequence of guided quizzes.
+
+**Not sure what these functions mean?** 
+
+-   Run `?function_name` to check the description file
+-   Check the slides for the first 5 sessions 
+-   Google it!
+
+# Data preparation
+
+Let's set your working environment, load your packages and your data.
+
+## Instruction
+
+1. Create an R project and store the project somewhere on your computer
+2. Unzip the files that I sent you via email and put them in the same folder where the .Rproj file is at.
+3. Open up `06-interative-workshop.Rmd`.
+
+## Tasks
+
+1. Run the lines in the following chunk to make sure all necessary packages are loaded.
+
+```{r}
+# required packages
+packages <- c("tidyverse", "psych", "here", "skimr", "tldr", "esquisse","broom", "texreg")
+
+# check package existence before installing them
+install.packages(setdiff(packages, rownames(installed.packages())))
+```
+
+2. Load the three datasets that we created for you. They should look pretty similar to the TIES datasets that you work with. 
+
+- Use `here::here()` to find the datasets within the `data` folder in your project working directory. 
+- Use `read_csv()` to load each datasets
+- Name the activity tracker dataset `act`, the attendance dataset `attend`, and the egra dataste `egra`.
+- Hint: `act <- read_csv(here::here("Data/activity_tracker.csv"))`
+
+## Answer
+
+```{r}
+act <- read_csv(here::here("data/activity_tracker.csv"))
+attend <- read_csv(here::here("data/attendance.csv"))
+egra <- read_csv(here::here("data/egra.csv"))
+```
+
+# Data inspection
+
+## Instruction
+
+The three simulated datasets describe data information from a randomized controlled trial for primary school children in 10 classes. 
+
+`act` contains information about the daily activity trackers of Mindfulness and Brain Games SEL activities for each class on each day. 
+
+`attend` contains information about each student's daily attendance.
+
+`egra` contains information about the treatment condition (`tx`), baseline demographics, baseline EGRA subtask scores (`xxx_b`) and endline EGRA subtask scores (`xxx_e`). EGRA = Early grade reading assessment.
+
+## Tasks
+
+1. Discuss in your group what each of the following functions do: `View()`, `unique()`, `names()`, `str()`, `dim()`, `head()`, `tail()`
+
+2. Use the correct function to report the following:
+
+- Number of rows and columns in the `egra` dataset
+- Variable names in the `act` dataset
+- The number of student in the `attend` dataset
+
+## Answer
+
+```{r}
+dim(egra)
+names(act)
+length(unique(attend$id))
+```
+
+# Basic data wrangling
+
+## Instructions
+
+In this task, we are only using the `egra` dataset to try some data wrangling techniques.
+
+## Tasks
+
+1. Discuss in your group what each of the following functions do: `%>%`, `select()`, `filter()`, `arrange()`, `mutate()`, `summarize()`, `group_by()`
+
+2. Use `select()` to select out the first 17 variables (from `id` to `work` in the `egra` dataset). Store the resulting dataset to `egra.s`.
+
+3. Use `filter()` in `egra.s` to select out the rows where `tx` is equal to `0` (i.e. we are checking baseline demographics for the control group kids). Store the resulting dataset to `egra.s` (i.e. you can overwrite `egra.s`).
+
+4. Use `arrange()` to sort the dataset by `id`. Store the resulting dataset to `egra.s` (i.e. you can overwrite `egra.s`).
+
+5. Use `mutate()` to create a dummy variable called `live_far` in `egra.s`. `live_far` should take the value of `1` if `minutes` >= the median of `minutes`, the value of `0` if `minutes` < the median of `minutes`. `minutes` describes the number of minutes students need to travel to school. Hint: use `if_else()` within `mutate`. Store the resulting dataset to `egra.s` (i.e. you can overwrite `egra.s`).
+
+6. Use `group_by()`, `summarize()` and `%>%` to create a summarized dataset from `egra.s` that contains the percentage of students that live far from school (i.e. use `mean()` on `live_far`)  for each classroom. Print the resulting data.frame (name it `my_results1`), which should contain two variables and 10 rows, the first variable is `class`, the second variable is `percent_live_far`.
+
+7. Use `%>%` to connect task 1-6 in a single sequence of command that starts from `egra` and saved to `my_results2`. Print `my_results2` to check if it is the same as `my_results1` you get in step 6.
+
+## Answer
+
+```{r}
+egra.s <- select(egra, id:work)
+egra.s <- filter(egra.s, tx == 0)
+egra.s <- arrange(egra.s, by = "id")
+egra.s <- mutate(egra.s, 
+                 live_far = if_else(minutes >= median(minutes, na.rm = T),
+                         1,
+                         0)
+                 )
+my_results1 <- egra.s %>% 
+  group_by(class) %>% 
+  summarize(percent_live_far = mean(live_far, na.rm = T))
+
+# do it all at once
+my_results2 <- egra %>% 
+  select(id:work) %>% 
+  filter(tx == 0) %>% 
+  arrange(by = "id") %>% 
+  mutate(live_far = if_else(minutes >= median(minutes, na.rm = T),
+                         1,
+                         0)
+                 ) %>% 
+  group_by(class) %>% 
+  summarize(percent_live_far = mean(live_far, na.rm = T))
+```
+
+# Data joining
+
+## Instruction
+
+Often times, we need to join datasets at different levels (i.e. date, student, class) in order to perform more complex analyses (e.g. multi-level analyses). In this workshop, we won't be covering any of those analyses, but it would be good to use the three datasets to practice data joining/merging.
+
+## Tasks
+
+1. Discuss in your group what each of the following functions do `inner_join()`, `left_join()`, `right_join()`, `full_join()`.
+
+2. Merge `attend` with `act` by `class` and `date`, keep all rows in `attend`, store the resulting data.frame in `dat`.
+
+3. Merge `dat` with `egra` by `id`, keep all rows in `dat`, store the resulting data.frame in `dat` (i.e. overwrite `dat`).
+
+4. How many rows and columns are there in `dat`? What is the potential danger of merging data this way? What observations would be missed?
+
+## Answers
+
+```{r}
+# inner_join(): includes all rows in x and y
+# left_join(): includes all rows in x and matching rows in y
+# right_join(): includes all matching rows in x and all rows in y
+# full_join(): includes all rows in x or y
+
+dat <- attend %>% 
+  left_join(act, by = c("class", "date")) %>% 
+  left_join(egra, by = "id")
+
+dim(dat)
+
+# We are only keeping all the rows in `attend`. So if there are activities on dates that not shown in `attend`, they are not merged. If there are students that do not have data in `attend`, they are not merged either. How you merge your data really depends on your focal group. If you focal group is all students that at least had some attendance in the attendance dataset, then the merging may be justified.
+```
+
+# String control
+
+## Instruction
+
+In this task, we are only using the `act` dataset to clean the character strings. **Skip this task if time is running short.**
+
+## Task
+
+1. Use `unique()` to find the unique values in `act$m_act`. What anomaly in the string do you notice?
+
+2. Use regular expression in `str_replace()` in `mutate()` to fix this anomaly. Try your regular expressions on https://regex101.com/.
+
+## Answers
+
+```{r}
+unique(act$m_act)
+
+act <- act %>% 
+  mutate(m_act = str_replace(m_act, "^(.*)(_)$", "\\1"))
+
+unique(act$m_act)
+```
+
+# Descriptive statistics
+
+## Instruction
+
+Now we move on to some descriptive statistics. In this task, we are only using the `egra` dataset.
+
+## Tasks
+
+1. Use `psych::describe()` or `skimr::skim()` to acquire descriptive information on all variables in the `egra` dataset.
+
+2. Use `table()` to cross-tabulate `tx` and `gender`.
+
+## Answers
+
+```{r}
+psych::describe(egra)
+skimr::skim(egra)
+
+table(egra$tx, egra$gender)
+```
+
+# Plotting
+
+## Instruction
+
+Let's try some plots! Use `esquisse::esquisser()` to create ggplots and copy paste the resulting R codes.
+
+
+## Tasks
+
+1. Create a histogram of `minutes`.
+
+2. Create a boxplot of `reading_e` by `tx`.
+
+3. Plot the relationship between `reading_b` and `reading_e` using a scatterplot. Add a loess line to the plot.
+
+## Answer
+
+```{r}
+ggplot(egra, aes(x = minutes)) +
+  geom_histogram()
+
+ggplot(egra, aes(x = factor(tx), y = reading_e)) +
+  geom_boxplot()
+
+ggplot(egra, aes(x = reading_b, y = reading_e)) +
+  geom_point() + 
+  geom_smooth(method = "loess")
+```
+
+# Modeling
+
+## Instruction
+
+Let's run some models! In this task, we are only using the `egra` dataset.
+
+## Tasks
+
+1. Check if `gender` and `tx` are independent from each other using `chisq.test()`.
+
+2. Run `t.test` to compare the means of `orient_e` between levels of `gender`.
+
+3. Run `cor` to check the correlation between `letter_sound_b` and `letter_sound_e`. 
+
+4. Create a correlation matrix for all EGRA variables in `egra`. Use the provided function (`corstarsl`) below.
+
+```{r}
+corstarsl <- function(x){ 
+x <- as.matrix(x) 
+R <- Hmisc::rcorr(x)$r 
+p <- Hmisc::rcorr(x)$P 
+## define notions for significance levels; spacing is important.
+mystars <- ifelse(p < .001, "***", ifelse(p < .01, "**", ifelse(p < .05, "*", "")))
+## trunctuate the matrix that holds the correlations to two decimal
+R <- format(round(cbind(rep(-1.11, ncol(x)), R), 3))[,-1] 
+## build a new matrix that includes the correlations with their apropriate stars 
+Rnew <- matrix(paste(R, mystars, sep=""), ncol=ncol(x)) 
+diag(Rnew) <- paste(diag(R), " ", sep="") 
+rownames(Rnew) <- colnames(x) 
+colnames(Rnew) <- paste(colnames(x), "", sep="") 
+## remove upper triangle
+Rnew <- as.matrix(Rnew)
+Rnew[upper.tri(Rnew, diag = TRUE)] <- "--"
+Rnew[upper.tri(Rnew)] <- ""
+Rnew <- as.data.frame(Rnew) 
+## remove last column and return the matrix (which is now a data frame)
+Rnew <- cbind(Rnew[1:length(Rnew)])
+return(Rnew) 
+}
+```
+
+5. Create two sum scores of EGRA items, one at baseline (name it `egra_b`) and one at endline (name it `egra_e`) using `mutate()` with `rowSums()`. Run `lm()` to check the treatment effect of `tx` on `egra_e`, adjusting for `egra_b` and other pre-intervention confounders. You can choose confounders that make sense to you. You can add classroom fixed effect by adding `factor(class)` to the regression. Also run `factor()` on variables that are treated as numeric in R but are essentially categorical (e.g. `gender`, `home_lang`). Store the model results into `fit`.
+
+6. Report the results from `fit` using `summary()`, `broom::tidy`, `broom::glance()`.
+
+## Answer
+
+```{r}
+chisq.test(egra$gender, egra$tx)
+t.test(egra$orient_e, egra$gender)
+cor(egra$letter_sound_b, egra$letter_sound_e)
+
+corstarsl(egra %>% select(orient_b:letter_e))
+
+egra <- egra %>% 
+  mutate(egra_b = rowSums(select(., orient_b:letter_b)),
+         egra_e = rowSums(select(., orient_e:letter_e))
+         )
+
+fit <- lm(egra_e ~ egra_b + tx + age + factor(gender) + minutes + factor(class), data = egra)
+
+summary(fit)
+
+broom::tidy(fit)
+broom::glance(fit)
+```
+
+# Bonus challenges
+
+## Tasks
+
+If all the lines run smoothly without error, you should be able to knit this Rmarkdown into an html/pdf/word file. Go to line 19 and change `eval = F` to `eval = T` so that all the R codes are evaluated to produce the results. Hit the knit button and knit the document to an html file (or a pdf or word file if you prefer).
+
+Note that knitting to pdf may require that you have LaTex installed on your computer. For Mac users, download MacTex here: https://www.tug.org/mactex/.
+
+
