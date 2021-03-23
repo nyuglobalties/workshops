@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2021-03-16" />
+<meta name="date" content="2021-03-23" />
 
 <title>Session 6: try this at home!</title>
 
@@ -267,7 +267,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Session 6: try this at home!</h1>
-<h4 class="date">2021-03-16</h4>
+<h4 class="date">2021-03-23</h4>
 
 </div>
 
@@ -287,12 +287,26 @@ div.tocify {
 <li>Plots: <code>esquisse::esquisser()</code>, <code>ggplot()</code></li>
 <li>Modeling: <code>chisq.test()</code>, <code>cor()</code>, <code>Hmisc::rcorr()</code>, <code>psych::corr.test()</code>, <code>t.test()</code>, <code>aov()</code>, <code>lm()</code>, <code>texreg::texreg()</code></li>
 </ul>
-<p><strong>That is a lot!!!</strong> No worries, you will get a chance to use some of them through a sequence of guided quizzes.</p>
+<p><strong>That is a lot!!!</strong> No worries, you will get a chance to use some of them through a sequence of guided problem sets.</p>
+<p><strong>How should we work on these problems?</strong></p>
+<ul>
+<li><p>I’ll put you into breakout rooms <u><strong>in pairs</strong></u>.</p></li>
+<li><p>Patrick and Michael will circle around the breakout rooms and answer immediate questions. You can also “summon” us by inviting the hosts to your breakout room.</p></li>
+</ul>
 <p><strong>Not sure what these functions mean?</strong></p>
 <ul>
-<li>Run <code>?function_name</code> to check the description file</li>
-<li>Check the slides for the first 5 sessions</li>
+<li>Run <code>?function_name</code> to check the help page.</li>
+<li>Check the slides for the first 5 sessions.</li>
 <li>Google it!</li>
+</ul>
+<p><strong>How much time should I spend on each sub-task?</strong></p>
+<ul>
+<li><p>I have rated each sub-task by difficulty ranging from level 1 (⭐) - level 3 (⭐⭐⭐).</p></li>
+<li><p>Spend a maximum of <u><strong>2 minutes</strong></u> on level-1 tasks with ⭐</p></li>
+<li><p>Spend a maximum of <u><strong>4 minutes</strong></u> on level-2 tasks with ⭐⭐</p></li>
+<li><p>Spend a maximum of <u><strong>6 minutes</strong></u> on level-3 tasks with ⭐⭐⭐</p></li>
+<li><p>If you could not figure out the answer to certain questions within the given time, take 1-2 minutes to check the answer sheet and copy it to your script.</p></li>
+<li><p>It is unlikely that you will manage to answer all the questions in 90 minutes, so I have also labeled sub-tasks that are optional (yet important) in this workshop with ⁉️. You may finish them after the workshop.</p></li>
 </ul>
 </div>
 <div id="data-preparation" class="section level1" number="2">
@@ -301,7 +315,7 @@ div.tocify {
 <div id="instruction" class="section level2" number="2.1">
 <h2 number="2.1"><span class="header-section-number">2.1</span> Instruction</h2>
 <ol style="list-style-type: decimal">
-<li>Create an R project and store the project somewhere on your computer</li>
+<li>Create an R project and store the project somewhere on your computer.</li>
 <li>Unzip the files that I sent you via email and put them in the same folder where the .Rproj file is at.</li>
 <li>Open up <code>06-interative-workshop.Rmd</code>.</li>
 </ol>
@@ -309,21 +323,24 @@ div.tocify {
 <div id="tasks" class="section level2" number="2.2">
 <h2 number="2.2"><span class="header-section-number">2.2</span> Tasks</h2>
 <ol style="list-style-type: decimal">
-<li>Run the lines in the following chunk to make sure all necessary packages are loaded.</li>
+<li>Run the lines in the following chunk to make sure all necessary packages are loaded. ⭐</li>
 </ol>
 <pre class="r"><code># required packages
 packages &lt;- c(&quot;tidyverse&quot;, &quot;psych&quot;, &quot;here&quot;, &quot;skimr&quot;, &quot;tldr&quot;, &quot;esquisse&quot;,&quot;broom&quot;, &quot;texreg&quot;)
 
 # check package existence before installing them
-install.packages(setdiff(packages, rownames(installed.packages())))</code></pre>
+install.packages(setdiff(packages, rownames(installed.packages())))
+
+# load the packages (you can also run library() on each of them)
+lapply(packages, library, character.only = TRUE)</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Load the three datasets that we created for you. They should look pretty similar to the TIES datasets that you work with.</li>
 </ol>
 <ul>
-<li>Use <code>here::here()</code> to find the datasets within the <code>data</code> folder in your project working directory.</li>
-<li>Use <code>read_csv()</code> to load each datasets</li>
-<li>Name the activity tracker dataset <code>act</code>, the attendance dataset <code>attend</code>, and the egra dataste <code>egra</code>.</li>
-<li>Hint: <code>act &lt;- read_csv(here::here(&quot;Data/activity_tracker.csv&quot;))</code></li>
+<li>Use <code>here::here()</code> to find the datasets within the <code>data</code> folder in your project working directory. ⭐</li>
+<li>Use <code>read_csv()</code> to load each datasets. ⭐</li>
+<li>Name the activity tracker dataset <code>act</code>, the attendance dataset <code>attend</code>, and the egra dataste <code>egra</code>. ⭐</li>
+<li>Hint: <code>act &lt;- read_csv(here::here(&quot;data/activity_tracker.csv&quot;))</code></li>
 </ul>
 </div>
 <div id="answer" class="section level2" number="2.3">
@@ -345,13 +362,13 @@ egra &lt;- read_csv(here::here(&quot;data/egra.csv&quot;))</code></pre>
 <div id="tasks-1" class="section level2" number="3.2">
 <h2 number="3.2"><span class="header-section-number">3.2</span> Tasks</h2>
 <ol style="list-style-type: decimal">
-<li><p>Discuss in your group what each of the following functions do: <code>View()</code>, <code>unique()</code>, <code>names()</code>, <code>str()</code>, <code>dim()</code>, <code>head()</code>, <code>tail()</code></p></li>
+<li><p>Discuss in your group what each of the following functions do: <code>View()</code>, <code>unique()</code>, <code>names()</code>, <code>str()</code>, <code>dim()</code>, <code>head()</code>, <code>tail()</code>⁉️</p></li>
 <li><p>Use the correct function to report the following:</p></li>
 </ol>
 <ul>
-<li>Number of rows and columns in the <code>egra</code> dataset</li>
-<li>Variable names in the <code>act</code> dataset</li>
-<li>The number of student in the <code>attend</code> dataset</li>
+<li>Number of rows and columns in the <code>egra</code> dataset. ⭐</li>
+<li>Variable names in the <code>act</code> dataset. ⭐</li>
+<li>The number of student in the <code>attend</code> dataset. ⭐</li>
 </ul>
 </div>
 <div id="answer-1" class="section level2" number="3.3">
@@ -370,13 +387,13 @@ length(unique(attend$id))</code></pre>
 <div id="tasks-2" class="section level2" number="4.2">
 <h2 number="4.2"><span class="header-section-number">4.2</span> Tasks</h2>
 <ol style="list-style-type: decimal">
-<li><p>Discuss in your group what each of the following functions do: <code>%&gt;%</code>, <code>select()</code>, <code>filter()</code>, <code>arrange()</code>, <code>mutate()</code>, <code>summarize()</code>, <code>group_by()</code></p></li>
-<li><p>Use <code>select()</code> to select out the first 17 variables (from <code>id</code> to <code>work</code> in the <code>egra</code> dataset). Store the resulting dataset to <code>egra.s</code>.</p></li>
-<li><p>Use <code>filter()</code> in <code>egra.s</code> to select out the rows where <code>tx</code> is equal to <code>0</code> (i.e. we are checking baseline demographics for the control group kids). Store the resulting dataset to <code>egra.s</code> (i.e. you can overwrite <code>egra.s</code>).</p></li>
-<li><p>Use <code>arrange()</code> to sort the dataset by <code>id</code>. Store the resulting dataset to <code>egra.s</code> (i.e. you can overwrite <code>egra.s</code>).</p></li>
-<li><p>Use <code>mutate()</code> to create a dummy variable called <code>live_far</code> in <code>egra.s</code>. <code>live_far</code> should take the value of <code>1</code> if <code>minutes</code> &gt;= the median of <code>minutes</code>, the value of <code>0</code> if <code>minutes</code> &lt; the median of <code>minutes</code>. <code>minutes</code> describes the number of minutes students need to travel to school. Hint: use <code>if_else()</code> within <code>mutate</code>. Store the resulting dataset to <code>egra.s</code> (i.e. you can overwrite <code>egra.s</code>).</p></li>
-<li><p>Use <code>group_by()</code>, <code>summarize()</code> and <code>%&gt;%</code> to create a summarized dataset from <code>egra.s</code> that contains the percentage of students that live far from school (i.e. use <code>mean()</code> on <code>live_far</code>) for each classroom. Print the resulting data.frame (name it <code>my_results1</code>), which should contain two variables and 10 rows, the first variable is <code>class</code>, the second variable is <code>percent_live_far</code>.</p></li>
-<li><p>Use <code>%&gt;%</code> to connect task 1-6 in a single sequence of command that starts from <code>egra</code> and saved to <code>my_results2</code>. Print <code>my_results2</code> to check if it is the same as <code>my_results1</code> you get in step 6.</p></li>
+<li><p>Discuss in your group what each of the following functions do: <code>%&gt;%</code>, <code>select()</code>, <code>filter()</code>, <code>arrange()</code>, <code>mutate()</code>, <code>summarize()</code>, <code>group_by()</code>. ⁉️</p></li>
+<li><p>Use <code>select()</code> to select out the first 17 variables (from <code>id</code> to <code>work</code> in the <code>egra</code> dataset). Store the resulting dataset to <code>egra.s</code>. ⭐</p></li>
+<li><p>Use <code>filter()</code> in <code>egra.s</code> to select out the rows where <code>tx</code> is equal to <code>0</code> (i.e. we are checking baseline demographics for the control group kids). Store the resulting dataset to <code>egra.s</code> (i.e. you can overwrite <code>egra.s</code>). ⭐⭐</p></li>
+<li><p>Use <code>arrange()</code> to sort the dataset by <code>id</code>. Store the resulting dataset to <code>egra.s</code> (i.e. you can overwrite <code>egra.s</code>). ⭐</p></li>
+<li><p>Use <code>mutate()</code> to create a dummy variable called <code>live_far</code> in <code>egra.s</code>. <code>live_far</code> should take the value of <code>1</code> if <code>minutes</code> &gt;= the median of <code>minutes</code>, the value of <code>0</code> if <code>minutes</code> &lt; the median of <code>minutes</code>. <code>minutes</code> describes the number of minutes students need to travel to school. Hint: use <code>if_else()</code> within <code>mutate</code>. Store the resulting dataset to <code>egra.s</code> (i.e. you can overwrite <code>egra.s</code>). ⭐⭐⭐</p></li>
+<li><p>Use <code>group_by()</code>, <code>summarize()</code> and <code>%&gt;%</code> to create a summarized dataset from <code>egra.s</code> that contains the percentage of students that live far from school (i.e. use <code>mean()</code> on <code>live_far</code>) for each classroom. Print the resulting data.frame (name it <code>my_results1</code>), which should contain two variables and 10 rows, the first variable is <code>class</code>, the second variable is <code>percent_live_far</code>. ⭐⭐⭐</p></li>
+<li><p>Use <code>%&gt;%</code> to connect task 1-6 in a single sequence of command that starts from <code>egra</code> and saved to <code>my_results2</code>. Print <code>my_results2</code> to check if it is the same as <code>my_results1</code> you get in step 6. ⭐⭐⭐</p></li>
 </ol>
 </div>
 <div id="answer-2" class="section level2" number="4.3">
@@ -410,15 +427,15 @@ my_results2 &lt;- egra %&gt;%
 <h1 number="5"><span class="header-section-number">5</span> Data joining</h1>
 <div id="instruction-2" class="section level2" number="5.1">
 <h2 number="5.1"><span class="header-section-number">5.1</span> Instruction</h2>
-<p>Often times, we need to join datasets at different levels (i.e. date, student, class) in order to perform more complex analyses (e.g. multi-level analyses). In this workshop, we won’t be covering any of those analyses, but it would be good to use the three datasets to practice data joining/merging.</p>
+<p>Often times, we need to join datasets at different levels (i.e. date, student, class) in order to perform more complex analyses (e.g. multi-level analyses). In this workshop, we won’t be covering any of those analyses, but it would be good to use the three datasets to practice data joining/merging. <u><strong>Skip this task if time is running short.</strong></u></p>
 </div>
 <div id="tasks-3" class="section level2" number="5.2">
 <h2 number="5.2"><span class="header-section-number">5.2</span> Tasks</h2>
 <ol style="list-style-type: decimal">
-<li><p>Discuss in your group what each of the following functions do <code>inner_join()</code>, <code>left_join()</code>, <code>right_join()</code>, <code>full_join()</code>.</p></li>
-<li><p>Merge <code>attend</code> with <code>act</code> by <code>class</code> and <code>date</code>, keep all rows in <code>attend</code>, store the resulting data.frame in <code>dat</code>.</p></li>
-<li><p>Merge <code>dat</code> with <code>egra</code> by <code>id</code>, keep all rows in <code>dat</code>, store the resulting data.frame in <code>dat</code> (i.e. overwrite <code>dat</code>).</p></li>
-<li><p>How many rows and columns are there in <code>dat</code>? What is the potential danger of merging data this way? What observations would be missed?</p></li>
+<li><p>Discuss in your group what each of the following functions do <code>inner_join()</code>, <code>left_join()</code>, <code>right_join()</code>, <code>full_join()</code>. ⁉️</p></li>
+<li><p>Merge <code>attend</code> with <code>act</code> by <code>class</code> and <code>date</code>, keep all rows in <code>attend</code>, store the resulting data.frame in <code>dat</code>. ⁉️</p></li>
+<li><p>Merge <code>dat</code> with <code>egra</code> by <code>id</code>, keep all rows in <code>dat</code>, store the resulting data.frame in <code>dat</code> (i.e. overwrite <code>dat</code>). ⁉️</p></li>
+<li><p>How many rows and columns are there in <code>dat</code>? What is the potential danger of merging data this way? What observations would be missed? ⁉️</p></li>
 </ol>
 </div>
 <div id="answers" class="section level2" number="5.3">
@@ -441,13 +458,13 @@ dim(dat)
 <h1 number="6"><span class="header-section-number">6</span> String control</h1>
 <div id="instruction-3" class="section level2" number="6.1">
 <h2 number="6.1"><span class="header-section-number">6.1</span> Instruction</h2>
-<p>In this task, we are only using the <code>act</code> dataset to clean the character strings. <strong>Skip this task if time is running short.</strong></p>
+<p>In this task, we are only using the <code>act</code> dataset to clean the character strings. <u><strong>Skip this task if time is running short.</strong></u></p>
 </div>
 <div id="task" class="section level2" number="6.2">
 <h2 number="6.2"><span class="header-section-number">6.2</span> Task</h2>
 <ol style="list-style-type: decimal">
-<li><p>Use <code>unique()</code> to find the unique values in <code>act$m_act</code>. What anomaly in the string do you notice?</p></li>
-<li><p>Use regular expression in <code>str_replace()</code> in <code>mutate()</code> to fix this anomaly. Try your regular expressions on <a href="https://regex101.com/" class="uri">https://regex101.com/</a>.</p></li>
+<li><p>Use <code>unique()</code> to find the unique values in <code>act$m_act</code>. What anomaly in the string do you notice? ⁉️</p></li>
+<li><p>Use regular expression in <code>str_replace()</code> in <code>mutate()</code> to fix this anomaly. Try your regular expressions on <a href="https://regex101.com/" class="uri">https://regex101.com/</a>. ⁉️</p></li>
 </ol>
 </div>
 <div id="answers-1" class="section level2" number="6.3">
@@ -469,8 +486,8 @@ unique(act$m_act)</code></pre>
 <div id="tasks-4" class="section level2" number="7.2">
 <h2 number="7.2"><span class="header-section-number">7.2</span> Tasks</h2>
 <ol style="list-style-type: decimal">
-<li><p>Use <code>psych::describe()</code> or <code>skimr::skim()</code> to acquire descriptive information on all variables in the <code>egra</code> dataset.</p></li>
-<li><p>Use <code>table()</code> to cross-tabulate <code>tx</code> and <code>gender</code>.</p></li>
+<li><p>Use <code>psych::describe()</code> or <code>skimr::skim()</code> to acquire descriptive information on all variables in the <code>egra</code> dataset. ⭐⭐</p></li>
+<li><p>Use <code>table()</code> to cross-tabulate <code>tx</code> and <code>gender</code>. ⭐</p></li>
 </ol>
 </div>
 <div id="answers-2" class="section level2" number="7.3">
@@ -490,9 +507,9 @@ table(egra$tx, egra$gender)</code></pre>
 <div id="tasks-5" class="section level2" number="8.2">
 <h2 number="8.2"><span class="header-section-number">8.2</span> Tasks</h2>
 <ol style="list-style-type: decimal">
-<li><p>Create a histogram of <code>minutes</code>.</p></li>
-<li><p>Create a boxplot of <code>reading_e</code> by <code>tx</code>.</p></li>
-<li><p>Plot the relationship between <code>reading_b</code> and <code>reading_e</code> using a scatterplot. Add a loess line to the plot.</p></li>
+<li><p>Create a histogram of <code>minutes</code>. ⭐⭐</p></li>
+<li><p>Create a boxplot of <code>reading_e</code> by <code>tx</code>. ⭐⭐</p></li>
+<li><p>Plot the relationship between <code>reading_b</code> and <code>reading_e</code> using a scatterplot. Add a loess line to the plot. ⭐⭐</p></li>
 </ol>
 </div>
 <div id="answer-3" class="section level2" number="8.3">
@@ -517,10 +534,10 @@ ggplot(egra, aes(x = reading_b, y = reading_e)) +
 <div id="tasks-6" class="section level2" number="9.2">
 <h2 number="9.2"><span class="header-section-number">9.2</span> Tasks</h2>
 <ol style="list-style-type: decimal">
-<li><p>Check if <code>gender</code> and <code>tx</code> are independent from each other using <code>chisq.test()</code>.</p></li>
-<li><p>Run <code>t.test</code> to compare the means of <code>orient_e</code> between levels of <code>gender</code>.</p></li>
-<li><p>Run <code>cor</code> to check the correlation between <code>letter_sound_b</code> and <code>letter_sound_e</code>.</p></li>
-<li><p>Create a correlation matrix for all EGRA variables in <code>egra</code>. Use the provided function (<code>corstarsl</code>) below.</p></li>
+<li><p>Check if <code>gender</code> and <code>tx</code> are independent from each other using <code>chisq.test()</code>. ⭐⭐</p></li>
+<li><p>Run <code>t.test</code> to compare the means of <code>orient_e</code> between levels of <code>gender</code>. ⭐⭐</p></li>
+<li><p>Run <code>cor</code> to check the correlation between <code>letter_sound_b</code> and <code>letter_sound_e</code>. ⭐⭐</p></li>
+<li><p>Create a correlation matrix for all EGRA variables in <code>egra</code>. Use the provided function (<code>corstarsl</code>) below. ⭐⭐</p></li>
 </ol>
 <pre class="r"><code>corstarsl &lt;- function(x){ 
 x &lt;- as.matrix(x) 
@@ -545,8 +562,8 @@ Rnew &lt;- cbind(Rnew[1:length(Rnew)])
 return(Rnew) 
 }</code></pre>
 <ol start="5" style="list-style-type: decimal">
-<li><p>Create two sum scores of EGRA items, one at baseline (name it <code>egra_b</code>) and one at endline (name it <code>egra_e</code>) using <code>mutate()</code> with <code>rowSums()</code>. Run <code>lm()</code> to check the treatment effect of <code>tx</code> on <code>egra_e</code>, adjusting for <code>egra_b</code> and other pre-intervention confounders. You can choose confounders that make sense to you. You can add classroom fixed effect by adding <code>factor(class)</code> to the regression. Also run <code>factor()</code> on variables that are treated as numeric in R but are essentially categorical (e.g. <code>gender</code>, <code>home_lang</code>). Store the model results into <code>fit</code>.</p></li>
-<li><p>Report the results from <code>fit</code> using <code>summary()</code>, <code>broom::tidy</code>, <code>broom::glance()</code>.</p></li>
+<li><p>Create two sum scores of EGRA items, one at baseline (name it <code>egra_b</code>) and one at endline (name it <code>egra_e</code>) using <code>mutate()</code> with <code>rowSums()</code>. Run <code>lm()</code> to check the treatment effect of <code>tx</code> on <code>egra_e</code>, adjusting for <code>egra_b</code> and other pre-intervention confounders. You can choose confounders that make sense to you. You can add classroom fixed effect by adding <code>factor(class)</code> to the regression. Also run <code>factor()</code> on variables that are treated as numeric in R but are essentially categorical (e.g. <code>gender</code>, <code>home_lang</code>). Store the model results into <code>fit</code>. ⭐⭐⭐</p></li>
+<li><p>Report the results from <code>fit</code> using <code>summary()</code>, <code>broom::tidy</code>, <code>broom::glance()</code>. ⭐⭐</p></li>
 </ol>
 </div>
 <div id="answer-4" class="section level2" number="9.3">
@@ -574,7 +591,7 @@ broom::glance(fit)</code></pre>
 <h1 number="10"><span class="header-section-number">10</span> Bonus challenges</h1>
 <div id="tasks-7" class="section level2" number="10.1">
 <h2 number="10.1"><span class="header-section-number">10.1</span> Tasks</h2>
-<p>If all the lines run smoothly without error, you should be able to knit this Rmarkdown into an html/pdf/word file. Go to line 19 and change <code>eval = F</code> to <code>eval = T</code> so that all the R codes are evaluated to produce the results. Hit the knit button and knit the document to an html file (or a pdf or word file if you prefer).</p>
+<p>If all the lines run smoothly without error, you should be able to knit this Rmarkdown into an html/pdf/word file. Go to line 19 and change <code>eval = F</code> to <code>eval = T</code> so that all the R codes are evaluated to produce the results. Hit the knit button and knit the document to an html file (or a pdf or word file if you prefer). ⭐⭐⭐</p>
 <p>Note that knitting to pdf may require that you have LaTex installed on your computer. For Mac users, download MacTex here: <a href="https://www.tug.org/mactex/" class="uri">https://www.tug.org/mactex/</a>.</p>
 </div>
 </div>
