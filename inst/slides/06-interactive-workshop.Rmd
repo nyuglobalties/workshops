@@ -34,13 +34,33 @@ In the past five workshops, we've covered the following topics:
 -   Plots: `esquisse::esquisser()`, `ggplot()`
 -   Modeling: `chisq.test()`, `cor()`, `Hmisc::rcorr()`, `psych::corr.test()`, `t.test()`, `aov()`, `lm()`, `texreg::texreg()`
 
-**That is a lot!!!** No worries, you will get a chance to use some of them through a sequence of guided quizzes.
+**That is a lot!!!** No worries, you will get a chance to use some of them through a sequence of guided problem sets.
 
-**Not sure what these functions mean?** 
+**How should we work on these problems?**
 
--   Run `?function_name` to check the description file
--   Check the slides for the first 5 sessions 
+-   I'll put you into breakout rooms [**in pairs**]{.ul}.
+
+-   Patrick and Michael will circle around the breakout rooms and answer immediate questions. You can also "summon" us by inviting the hosts to your breakout room.
+
+**Not sure what these functions mean?**
+
+-   Run `?function_name` to check the help page.
+-   Check the slides for the first 5 sessions.
 -   Google it!
+
+**How much time should I spend on each sub-task?**
+
+-   I have rated each sub-task by difficulty ranging from level 1 (⭐) - level 3 (⭐⭐⭐).
+
+-   Spend a maximum of [**2 minutes**]{.ul} on level-1 tasks with ⭐
+
+-   Spend a maximum of [**4 minutes**]{.ul} on level-2 tasks with ⭐⭐
+
+-   Spend a maximum of [**6 minutes**]{.ul} on level-3 tasks with ⭐⭐⭐
+
+-   If you could not figure out the answer to certain questions within the given time, take 1-2 minutes to check the answer sheet and copy it to your script.
+
+-   It is unlikely that you will manage to answer all the questions in 90 minutes, so I have also labeled sub-tasks that are optional (yet important) in this workshop with ⁉️. You may finish them after the workshop.
 
 # Data preparation
 
@@ -48,13 +68,13 @@ Let's set your working environment, load your packages and your data.
 
 ## Instruction
 
-1. Create an R project and store the project somewhere on your computer
-2. Unzip the files that I sent you via email and put them in the same folder where the .Rproj file is at.
-3. Open up `06-interative-workshop.Rmd`.
+1.  Create an R project and store the project somewhere on your computer.
+2.  Unzip the files that I sent you via email and put them in the same folder where the .Rproj file is at.
+3.  Open up `06-interative-workshop.Rmd`.
 
 ## Tasks
 
-1. Run the lines in the following chunk to make sure all necessary packages are loaded.
+1.  Run the lines in the following chunk to make sure all necessary packages are loaded. ⭐
 
 ```{r}
 # required packages
@@ -62,14 +82,17 @@ packages <- c("tidyverse", "psych", "here", "skimr", "tldr", "esquisse","broom",
 
 # check package existence before installing them
 install.packages(setdiff(packages, rownames(installed.packages())))
+
+# load the packages (you can also run library() on each of them)
+lapply(packages, library, character.only = TRUE)
 ```
 
-2. Load the three datasets that we created for you. They should look pretty similar to the TIES datasets that you work with. 
+2.  Load the three datasets that we created for you. They should look pretty similar to the TIES datasets that you work with.
 
-- Use `here::here()` to find the datasets within the `data` folder in your project working directory. 
-- Use `read_csv()` to load each datasets
-- Name the activity tracker dataset `act`, the attendance dataset `attend`, and the egra dataste `egra`.
-- Hint: `act <- read_csv(here::here("Data/activity_tracker.csv"))`
+-   Use `here::here()` to find the datasets within the `data` folder in your project working directory. ⭐
+-   Use `read_csv()` to load each datasets. ⭐
+-   Name the activity tracker dataset `act`, the attendance dataset `attend`, and the egra dataste `egra`. ⭐
+-   Hint: `act <- read_csv(here::here("data/activity_tracker.csv"))`
 
 ## Answer
 
@@ -83,9 +106,9 @@ egra <- read_csv(here::here("data/egra.csv"))
 
 ## Instruction
 
-The three simulated datasets describe data information from a randomized controlled trial for primary school children in 10 classes. 
+The three simulated datasets describe data information from a randomized controlled trial for primary school children in 10 classes.
 
-`act` contains information about the daily activity trackers of Mindfulness and Brain Games SEL activities for each class on each day. 
+`act` contains information about the daily activity trackers of Mindfulness and Brain Games SEL activities for each class on each day.
 
 `attend` contains information about each student's daily attendance.
 
@@ -93,13 +116,13 @@ The three simulated datasets describe data information from a randomized control
 
 ## Tasks
 
-1. Discuss in your group what each of the following functions do: `View()`, `unique()`, `names()`, `str()`, `dim()`, `head()`, `tail()`
+1.  Discuss in your group what each of the following functions do: `View()`, `unique()`, `names()`, `str()`, `dim()`, `head()`, `tail()`⁉️
 
-2. Use the correct function to report the following:
+2.  Use the correct function to report the following:
 
-- Number of rows and columns in the `egra` dataset
-- Variable names in the `act` dataset
-- The number of student in the `attend` dataset
+-   Number of rows and columns in the `egra` dataset. ⭐
+-   Variable names in the `act` dataset. ⭐
+-   The number of student in the `attend` dataset. ⭐
 
 ## Answer
 
@@ -117,19 +140,19 @@ In this task, we are only using the `egra` dataset to try some data wrangling te
 
 ## Tasks
 
-1. Discuss in your group what each of the following functions do: `%>%`, `select()`, `filter()`, `arrange()`, `mutate()`, `summarize()`, `group_by()`
+1.  Discuss in your group what each of the following functions do: `%>%`, `select()`, `filter()`, `arrange()`, `mutate()`, `summarize()`, `group_by()`. ⁉️
 
-2. Use `select()` to select out the first 17 variables (from `id` to `work` in the `egra` dataset). Store the resulting dataset to `egra.s`.
+2.  Use `select()` to select out the first 17 variables (from `id` to `work` in the `egra` dataset). Store the resulting dataset to `egra.s`. ⭐
 
-3. Use `filter()` in `egra.s` to select out the rows where `tx` is equal to `0` (i.e. we are checking baseline demographics for the control group kids). Store the resulting dataset to `egra.s` (i.e. you can overwrite `egra.s`).
+3.  Use `filter()` in `egra.s` to select out the rows where `tx` is equal to `0` (i.e. we are checking baseline demographics for the control group kids). Store the resulting dataset to `egra.s` (i.e. you can overwrite `egra.s`). ⭐⭐
 
-4. Use `arrange()` to sort the dataset by `id`. Store the resulting dataset to `egra.s` (i.e. you can overwrite `egra.s`).
+4.  Use `arrange()` to sort the dataset by `id`. Store the resulting dataset to `egra.s` (i.e. you can overwrite `egra.s`). ⭐
 
-5. Use `mutate()` to create a dummy variable called `live_far` in `egra.s`. `live_far` should take the value of `1` if `minutes` >= the median of `minutes`, the value of `0` if `minutes` < the median of `minutes`. `minutes` describes the number of minutes students need to travel to school. Hint: use `if_else()` within `mutate`. Store the resulting dataset to `egra.s` (i.e. you can overwrite `egra.s`).
+5.  Use `mutate()` to create a dummy variable called `live_far` in `egra.s`. `live_far` should take the value of `1` if `minutes` \>= the median of `minutes`, the value of `0` if `minutes` \< the median of `minutes`. `minutes` describes the number of minutes students need to travel to school. Hint: use `if_else()` within `mutate`. Store the resulting dataset to `egra.s` (i.e. you can overwrite `egra.s`). ⭐⭐⭐
 
-6. Use `group_by()`, `summarize()` and `%>%` to create a summarized dataset from `egra.s` that contains the percentage of students that live far from school (i.e. use `mean()` on `live_far`)  for each classroom. Print the resulting data.frame (name it `my_results1`), which should contain two variables and 10 rows, the first variable is `class`, the second variable is `percent_live_far`.
+6.  Use `group_by()`, `summarize()` and `%>%` to create a summarized dataset from `egra.s` that contains the percentage of students that live far from school (i.e. use `mean()` on `live_far`) for each classroom. Print the resulting data.frame (name it `my_results1`), which should contain two variables and 10 rows, the first variable is `class`, the second variable is `percent_live_far`. ⭐⭐⭐
 
-7. Use `%>%` to connect task 1-6 in a single sequence of command that starts from `egra` and saved to `my_results2`. Print `my_results2` to check if it is the same as `my_results1` you get in step 6.
+7.  Use `%>%` to connect task 1-6 in a single sequence of command that starts from `egra` and saved to `my_results2`. Print `my_results2` to check if it is the same as `my_results1` you get in step 6. ⭐⭐⭐
 
 ## Answer
 
@@ -163,17 +186,17 @@ my_results2 <- egra %>%
 
 ## Instruction
 
-Often times, we need to join datasets at different levels (i.e. date, student, class) in order to perform more complex analyses (e.g. multi-level analyses). In this workshop, we won't be covering any of those analyses, but it would be good to use the three datasets to practice data joining/merging.
+Often times, we need to join datasets at different levels (i.e. date, student, class) in order to perform more complex analyses (e.g. multi-level analyses). In this workshop, we won't be covering any of those analyses, but it would be good to use the three datasets to practice data joining/merging. [**Skip this task if time is running short.**]{.ul}
 
 ## Tasks
 
-1. Discuss in your group what each of the following functions do `inner_join()`, `left_join()`, `right_join()`, `full_join()`.
+1.  Discuss in your group what each of the following functions do `inner_join()`, `left_join()`, `right_join()`, `full_join()`. ⁉️
 
-2. Merge `attend` with `act` by `class` and `date`, keep all rows in `attend`, store the resulting data.frame in `dat`.
+2.  Merge `attend` with `act` by `class` and `date`, keep all rows in `attend`, store the resulting data.frame in `dat`. ⁉️
 
-3. Merge `dat` with `egra` by `id`, keep all rows in `dat`, store the resulting data.frame in `dat` (i.e. overwrite `dat`).
+3.  Merge `dat` with `egra` by `id`, keep all rows in `dat`, store the resulting data.frame in `dat` (i.e. overwrite `dat`). ⁉️
 
-4. How many rows and columns are there in `dat`? What is the potential danger of merging data this way? What observations would be missed?
+4.  How many rows and columns are there in `dat`? What is the potential danger of merging data this way? What observations would be missed? ⁉️
 
 ## Answers
 
@@ -196,13 +219,13 @@ dim(dat)
 
 ## Instruction
 
-In this task, we are only using the `act` dataset to clean the character strings. **Skip this task if time is running short.**
+In this task, we are only using the `act` dataset to clean the character strings. [**Skip this task if time is running short.**]{.ul}
 
 ## Task
 
-1. Use `unique()` to find the unique values in `act$m_act`. What anomaly in the string do you notice?
+1.  Use `unique()` to find the unique values in `act$m_act`. What anomaly in the string do you notice? ⁉️
 
-2. Use regular expression in `str_replace()` in `mutate()` to fix this anomaly. Try your regular expressions on https://regex101.com/.
+2.  Use regular expression in `str_replace()` in `mutate()` to fix this anomaly. Try your regular expressions on <https://regex101.com/>. ⁉️
 
 ## Answers
 
@@ -223,9 +246,9 @@ Now we move on to some descriptive statistics. In this task, we are only using t
 
 ## Tasks
 
-1. Use `psych::describe()` or `skimr::skim()` to acquire descriptive information on all variables in the `egra` dataset.
+1.  Use `psych::describe()` or `skimr::skim()` to acquire descriptive information on all variables in the `egra` dataset. ⭐⭐
 
-2. Use `table()` to cross-tabulate `tx` and `gender`.
+2.  Use `table()` to cross-tabulate `tx` and `gender`. ⭐
 
 ## Answers
 
@@ -242,14 +265,13 @@ table(egra$tx, egra$gender)
 
 Let's try some plots! Use `esquisse::esquisser()` to create ggplots and copy paste the resulting R codes.
 
-
 ## Tasks
 
-1. Create a histogram of `minutes`.
+1.  Create a histogram of `minutes`. ⭐⭐
 
-2. Create a boxplot of `reading_e` by `tx`.
+2.  Create a boxplot of `reading_e` by `tx`. ⭐⭐
 
-3. Plot the relationship between `reading_b` and `reading_e` using a scatterplot. Add a loess line to the plot.
+3.  Plot the relationship between `reading_b` and `reading_e` using a scatterplot. Add a loess line to the plot. ⭐⭐
 
 ## Answer
 
@@ -273,13 +295,13 @@ Let's run some models! In this task, we are only using the `egra` dataset.
 
 ## Tasks
 
-1. Check if `gender` and `tx` are independent from each other using `chisq.test()`.
+1.  Check if `gender` and `tx` are independent from each other using `chisq.test()`. ⭐⭐
 
-2. Run `t.test` to compare the means of `orient_e` between levels of `gender`.
+2.  Run `t.test` to compare the means of `orient_e` between levels of `gender`. ⭐⭐
 
-3. Run `cor` to check the correlation between `letter_sound_b` and `letter_sound_e`. 
+3.  Run `cor` to check the correlation between `letter_sound_b` and `letter_sound_e`. ⭐⭐
 
-4. Create a correlation matrix for all EGRA variables in `egra`. Use the provided function (`corstarsl`) below.
+4.  Create a correlation matrix for all EGRA variables in `egra`. Use the provided function (`corstarsl`) below. ⭐⭐
 
 ```{r}
 corstarsl <- function(x){ 
@@ -306,9 +328,9 @@ return(Rnew)
 }
 ```
 
-5. Create two sum scores of EGRA items, one at baseline (name it `egra_b`) and one at endline (name it `egra_e`) using `mutate()` with `rowSums()`. Run `lm()` to check the treatment effect of `tx` on `egra_e`, adjusting for `egra_b` and other pre-intervention confounders. You can choose confounders that make sense to you. You can add classroom fixed effect by adding `factor(class)` to the regression. Also run `factor()` on variables that are treated as numeric in R but are essentially categorical (e.g. `gender`, `home_lang`). Store the model results into `fit`.
+5.  Create two sum scores of EGRA items, one at baseline (name it `egra_b`) and one at endline (name it `egra_e`) using `mutate()` with `rowSums()`. Run `lm()` to check the treatment effect of `tx` on `egra_e`, adjusting for `egra_b` and other pre-intervention confounders. You can choose confounders that make sense to you. You can add classroom fixed effect by adding `factor(class)` to the regression. Also run `factor()` on variables that are treated as numeric in R but are essentially categorical (e.g. `gender`, `home_lang`). Store the model results into `fit`. ⭐⭐⭐
 
-6. Report the results from `fit` using `summary()`, `broom::tidy`, `broom::glance()`.
+6.  Report the results from `fit` using `summary()`, `broom::tidy`, `broom::glance()`. ⭐⭐
 
 ## Answer
 
@@ -336,8 +358,6 @@ broom::glance(fit)
 
 ## Tasks
 
-If all the lines run smoothly without error, you should be able to knit this Rmarkdown into an html/pdf/word file. Go to line 19 and change `eval = F` to `eval = T` so that all the R codes are evaluated to produce the results. Hit the knit button and knit the document to an html file (or a pdf or word file if you prefer).
+If all the lines run smoothly without error, you should be able to knit this Rmarkdown into an html/pdf/word file. Go to line 19 and change `eval = F` to `eval = T` so that all the R codes are evaluated to produce the results. Hit the knit button and knit the document to an html file (or a pdf or word file if you prefer). ⭐⭐⭐
 
-Note that knitting to pdf may require that you have LaTex installed on your computer. For Mac users, download MacTex here: https://www.tug.org/mactex/.
-
-
+Note that knitting to pdf may require that you have LaTex installed on your computer. For Mac users, download MacTex here: <https://www.tug.org/mactex/>.
