@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Session 7 (preview)</title>
+    <meta charset="utf-8" />
+    <meta name="date" content="2021-06-12" />
+    <script src="07-mrautomatr_files/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Session 7 (preview)
+## A gentle introduction to mrautomatr
+### Global TIES for Children
+### 2021-06-12
+
+---
+
+
+
+
+&lt;style&gt;
+:root {
+  --font12: 12pt;
+  --font10: 10pt;
+  --font2: 2pt;
+  --nyu-yellow: #ecaa00;
+  --nyu-red: #c50f3c;
+  --nyu-violet: #57068c;
+}
+
+.font12 &gt; table {
+  font-size: var(--font12);
+}
+
+.font12 &gt; p {
+  font-size: var(--font12);
+}
+
+.font12 &gt; ul {
+  font-size: var(--font12);
+}
+
+.font12 &gt; pre .remark-code-line {
+  font-size: var(--font12);
+}
+
+.font10 &gt; table {
+  font-size: var(--font10);
+}
+
+.font10 &gt; p {
+  font-size: var(--font10);
+}
+
+.font10 &gt; pre .remark-code-line {
+  font-size: var(--font10);
+}
+
+.font10 &gt; pre {
+  font-size: var(--font10);
+}
+
+.font2 &gt; pre {
+  font-size: var(--font2);
+}
+
+.font10 .str_view {
+  font-size: var(--font10);
+}
+
+.font10.rendered &gt; pre {
+  font-size: var(--font10);
+  font-family: var(--code-font-family);
+  background-color: #fdf6e3;
+  color: #657b83;
+  padding: 5px;
+}
+
+.yellow {
+  color: var(--nyu-yellow);
+}
+
+.red {
+  color: var(--nyu-red);
+}
+
+.violet {
+  color: var(--nyu-violet);
+}
+
+.highlighted {
+  background-color: var(--code-highlight-color);
+}
+
+.highlighted-block {
+  font-family: var(--code-font-family), Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+}
+
+.aligncenter {
+    text-align: center;
+}
+
+&lt;/style&gt;
+
+# Motivation
+
+--
+
+- Have you ever been frustrated by transporting tables from Mplus and Stata to Word?
+
+--
+
+- Have you ever spent hours fiddling with table formatting in Word?
+
+--
+
+- Have you imagined that one day you can get all the tables and plots the second you finish your analysis?
+
+--
+
+.aligncenter[
+
+**Now is your chance to try**
+
+### `mrautomatr`###
+]
+
+--
+
+.aligncenter[
+&lt;img src="../images/hexicon.png" height="200"&gt;
+]
+
+---
+
+# What is `mrautomatr`?
+
+--
+
+- It is an R package powered by `flextable` and `rmarkdown`, two wonderful open-source R pacakges.
+
+--
+
+- It takes your master dataset (`.csv/.dta/.xlsx`) and your Mplus output file (`.out`) and generates a measurement report for you.
+
+--
+
+- It requires *no* prior knowledge in R programming.
+
+--
+
+- All you need to do is:
+
+--
+
+--
+
+  - Put your files in place
+
+--
+
+  - Fill an excel sheet indicating 
+      - Where the files locate
+      - The name of your measure and items
+      - What data/output files to use
+      - Some descriptions of your measure
+
+--
+      
+  - Run a line of code in R
+ 
+--
+
+- And **BOOM!**, you get yourself a well-formatted measurement report in Microsoft Word!
+
+---
+
+# A simple roadmap
+
+.aligncenter[
+&lt;img src="../images/mrautomatr_diagram.png" height="400"&gt;
+]
+
+The preparation of files takes about **5-10 minutes**. Generating one report in R typically takes **less than 2 minutes** once you get familiar with the package.
+
+---
+
+# Why using it for TIES work?
+
+- Consistent [**naming rules**](https://nyu.app.box.com/s/ate5l7wmw164u7xjg3g8x1vrfhwnt0ax) of variables and files 
+
+- Measurement deliverables with consistent formatting
+
+--
+
+.aligncenter[### Let's take a look at [**the report**](https://nyu.app.box.com/s/wbwcqj3u2x9y6levrwgn9przp7ptr5hp)!
+]
+
+--
+
+- If you are interested in learning more about `mrautomatr`, feel free to:
+
+  - Join the next R workshop exclusively designed to introduce this package in a not-so-technical way (date TBD)
+  
+  - Visit the package bookdown website, and follow all the steps: https://bookdown.org/wuzezhen33/mrautomatr/
+  
+  - Try the package on your own data and let us know what works and what does not by opening a new GitHub issue at https://github.com/nyuglobalties/mrautomatr/issues.
+
+.aligncenter[
+### Thank you!
+]
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"countIncrementalSlides": false,
+"highlightLines": true,
+"highlightStyle": "solarized-light",
+"navigation": {
+"scroll": false
+}
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
