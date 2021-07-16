@@ -142,6 +142,28 @@ knitr::opts_chunk$set(warning = F, message = F)
 
 ---
 
+# Use `mrautomatr` for TIES work
+
+--
+
+- NYU Global TIES for Children (2021). “Understanding and improving the learning and development of children in low-income and crisis-affected countries: Toward research impact at scale.” *Proposal to NYUAD Research Institute for renewed core support.*
+  
+  - Strategy 5: Development and sharing of global public goods
+
+--
+
+- Building consistent and streamlined measure reports for the measurement library and for donors
+
+--
+
+- Efficient generation of intermediate test report for results compiling and internal reporting at any stage of your analysis
+
+--
+
+- Consistent [**naming rules**](https://nyu.app.box.com/s/ate5l7wmw164u7xjg3g8x1vrfhwnt0ax) of variables and files 
+
+---
+
 # What is `mrautomatr`?
 
 --
@@ -176,7 +198,7 @@ knitr::opts_chunk$set(warning = F, message = F)
 
 --
       
-  - Run a line of code in R
+  - Run a few lines of code in R
  
 --
 
@@ -194,15 +216,13 @@ The preparation of files takes about **5-10 minutes**. Generating one report in 
 
 ---
 
-# Why using it for TIES work?
+.aligncenter[
+<img src="../images/mrautomatr_options.png" height="600">
+]
 
-- Consistent [**naming rules**](https://nyu.app.box.com/s/ate5l7wmw164u7xjg3g8x1vrfhwnt0ax) of variables and files 
+---
 
-- Measurement deliverables with consistent formatting
-
---
-
-.aligncenter[### Let's take a look at [**the report**](https://nyu.app.box.com/s/wbwcqj3u2x9y6levrwgn9przp7ptr5hp)!
+.aligncenter[### Let's take a look at [**the report**](https://nyu.box.com/s/wy4y4zhoh9tc4sat3bd9x1hoz24gixei)!
 ]
 
 --
@@ -215,10 +235,17 @@ The preparation of files takes about **5-10 minutes**. Generating one report in 
   
   - Try the package on your own data and let us know what works and what does not by opening a new GitHub issue at https://github.com/nyuglobalties/mrautomatr/issues.
 
-.aligncenter[
-### Thank you!
-]
+--
 
+- What is next:
 
+  - Potential integration with the `kfa` (k-fold factor analysis) R package that the UNC team is developing
+  
+  - Potential integration with Stata and SEM analysis software besides Mplus
+  
+  - Potential extension to include reporting of IRT models
 
+---
+
+# Thank you!
 
