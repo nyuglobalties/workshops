@@ -123,7 +123,7 @@ knitr::opts_chunk$set(warning = F, message = F)
 
 --
 
-- Have you imagined that one day you can get all the tables and plots the second you finish your analysis?
+- Have you imagined that one day you can get all the tables and plots the minute you finish your analysis?
 
 --
 
@@ -152,11 +152,11 @@ knitr::opts_chunk$set(warning = F, message = F)
 
 --
 
-- Building consistent and streamlined measure reports for the measurement library and for donors
+- Building consistent and streamlined measurement reports for the measurement library and for donors and collaborators
 
 --
 
-- Efficient generation of intermediate test report for results compiling and internal reporting at any stage of your analysis
+- Efficient generation of intermediate test reports for results compiling and internal reporting purposes at any stage of your analysis
 
 --
 
@@ -176,7 +176,7 @@ knitr::opts_chunk$set(warning = F, message = F)
 
 --
 
-- It requires *no* prior knowledge in R programming.
+- It requires *very few* prior knowledge in R programming.
 
 --
 
@@ -190,8 +190,8 @@ knitr::opts_chunk$set(warning = F, message = F)
 
 --
 
-  - Fill an excel sheet indicating 
-      - Where the files locate
+  - Fill in an excel sheet indicating 
+      - Where the files are located
       - The name of your measure and items
       - What data/output files to use
       - Some descriptions of your measure
@@ -222,7 +222,7 @@ The preparation of files takes about **5-10 minutes**. Generating one report in 
 
 ---
 
-.aligncenter[### Let's take a look at [**the report**](https://nyu.box.com/s/wy4y4zhoh9tc4sat3bd9x1hoz24gixei)!
+.aligncenter[### Let's take a look at [**the report**](https://nyu.box.com/s/jgoa9suhsfli34ce0q7xkonpuyzw2sno)!
 ]
 
 --
