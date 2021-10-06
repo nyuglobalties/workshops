@@ -14,9 +14,13 @@
 
 # 3. Generate the report --------------------------------------------------
 
-## 3.1 Generate one report by code
+## 3.1 Generate one report by manually clicking & typing on a web page
+path = box_path("Box 3EA Team Folder/For Zezhen/MR automation/R workshop 7/PSRA")
 
-path = box_path("Box 3EA Team Folder/For Zezhen/MR automation/NGY1_FA/PSRA")
+render_report_manual(output_file = "Report_niger_psra.docx",
+                     output_dir = path)
+
+## 3.2 Generate one report by code
 
 render_report(
   output_dir = path,
@@ -30,7 +34,7 @@ render_report(
     # set report overall parameters
     template = file.path(path, "input_template_niger_psra.xlsx"),
     set_title = "Niger Year 1 Measurement Report - Preschool Stress Regulation Assessment (PSRA)",
-    set_author = "Ha Yeon Kim",
+    set_author = "Jane Doe",
 
     # select report sections
     item = TRUE,
@@ -54,9 +58,6 @@ render_report(
     inv_lg = TRUE)
 )
 
-## 3.2 Generate one report by manually clicking & typing on a web page
-render_report_manual(output_file = "Report_niger_psra.docx",
-                     output_dir = path)
 
 ## get omega manually because of issues with variable naming
 
@@ -83,7 +84,7 @@ get.omega.lg(
 
 ## 3.3 Generate multiple separate reports with the same set of settings
 
-## I am not covering this in the workshop as you will seldom use this package
+## I am not covering this in the workshop as you will seldom use this function
 ## unless you want to mass produce a bunch of reports with the same format
 ## see details at https://bookdown.org/wuzezhen33/mrautomatr/generate-the-report.html#render_report_multiple
 

@@ -5,7 +5,40 @@
 
 # You only need to run the following functions once!
 
-# 1.  Download and install ------------------------------------------------
+# 1.  Download and install from compressed file------------------------------------------------
+
+# For this workshop, run the following line to install a compiled version of the package
+# Change the path in the quotation marks to wherever you put the tar.gz file
+
+# If you are a Mac user
+# Go to Finder, locate the tar.gz file, single click to highlight the file
+# Hit Command + Option + C
+# Come back to R and paste in between the quotation marks below
+file <- "/Users/michaelfive/Desktop/R Directory/Git learning/mrautomatr_0.0.0.9000.tar.gz"
+install.packages(file, repos = NULL)
+
+# If you are a Windows user
+# Go to your folder, locate the tar.gz file, single click to highlight the file
+# Right click and select "Copy as path" OR click Home and select "copy path"
+# Come back to R and replace the quotes
+# Manually add another "\" each time you see a "\" in the quote
+file <- "C:\\Users\\michaelfive\\mrautomatr_0.0.0.9000.tar.gz"
+install.packages(file, repos = NULL)
+
+# For both Mac and Windows users
+# load the package into your R session
+library(mrautomatr)
+
+# check what functions exist in mrautomatr
+?mrautomatr
+
+######################################################
+###### IGNORE THE FOLLOWING DURING THE WORKSHOP ######
+######################################################
+
+# 2.  Download and install from Github ------------------------------------------------
+
+# This allows you to search for updates of the package on GitHub
 
 # Download R and Rstudio before opening this Rscript in Rstudio
 
@@ -34,7 +67,11 @@ edit_r_environ()
 # copy the token and paste it into the .Renviron file after the "=" sign; e.g., GITHUB_PAT=ghp_...
 
 # install mrautomatr from the nyuglobalties github repository
-install_github("nyuglobalties/mrautomatr")
+
+# restart R here
+
+# install the package from github
+devtools::install_github("nyuglobalties/mrautomatr")
 
 # load the package into your R session
 library(mrautomatr)

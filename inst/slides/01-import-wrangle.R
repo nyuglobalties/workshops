@@ -1,4 +1,6 @@
 # All executable code to accompany Session 1
+install.packages("tidyverse")
+install.packages("haven")
 
 library(readr)
 library(here)
@@ -51,7 +53,7 @@ mutate(
   dat,
   # Deletes the `X1` variable.
   # NULL is a symbol in R that means "no value" (not "missing"!).
-  X1 = NULL,
+  `...1` = NULL,
   # Changes Cohort to an index variable
   Cohort = ifelse(Cohort == "A", 1, 2)
 )
